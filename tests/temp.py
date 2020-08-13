@@ -23,7 +23,7 @@ class data_filter():
         self.is_categorical = {}
 
 
-    def categorica_var(self):
+    def categorica_data_encoding(self):
         """Identify categorical features. 
 
         Parameters
@@ -35,28 +35,41 @@ class data_filter():
         cat_dict: summary df with col index as key which needs to be change
         """
         col_type = self.df.dtypes
-        col_name = list(self.df)
         cat_var_index = [i for i, x in enumerate(col_type) if x == 'object']
 
+        # Loop over all the categorical column
         for i in cat_var_index:
 
+            # Converting all the categorical value to lower case 
+            self.df[self.df.columns[i]] = self.df[self.df.columns[i]].str.lower()
+
+            # Counting the unique value of the categorical value
             unique_col = pd.unique(self.df[self.df.columns[i]])
 
+            # Condition if the unique value is 2 and replacing it with numerical
             if len(unique_col) == 2:
                 dict_unique_2 = {}
 
+                # Loop for replacing each categorical value
                 for j, k in enumerate(unique_col):
                     dict_unique_2[k] = j
+
                 self.is_categorical[i] = dict_unique_2
+                
+                self.df[self.df.columns[i]].replace(dict_unique_2, inplace=True)
 
-            elif len(unique_col) == 1:
-                self.is_categorical[i] = 1
+            # Condition if the unique value is >2 and using one hot encoding
+            elif len(unique_col) > 2:
 
-            # else:
+                dummies_array = pd.get_dummies(self.df[self.df.columns[i]])
 
+                self.is_categorical[i] = list(dummies_array)
 
+                self.df = self.df.drop([self.df.columns[i]], axis = 1)
 
-        return cat_var_index
+                self.df = self.df.join(dummies_array)
+
+        return self.df, self.is_categorical
 
 
 
@@ -65,13 +78,5 @@ class data_filter():
 
 df = pd.read_excel("onehot.xlsx")
 a = data_filter(df)
-a_1= a.categorica_var()
-print(a.df.columns[a_1[0]])
-# print(list(pd.get_dummies(a.df[a.df.columns[a_1[1]]])))
-# print(pd.get_dummies(a1))
-# x = re.findall(r"(?i)unnamed" or r"(?i)sr" or r"(?i)index", df.columns[0])
-# print(len(x))
-# print(len(x)>0)
-
-# df.reset_index(drop=True, inplace=True)
-# print(df)
+a.categorica_data_encoding()
+print(a.df)
