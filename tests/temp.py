@@ -73,7 +73,7 @@ class data_filter():
 
                 self.df = self.df.join(dummies_array)
 
-        return self.df, self.is_categorical
+
 
 
 
@@ -82,5 +82,5 @@ class data_filter():
 
 df = pd.read_excel("onehot.xlsx")
 a = data_filter(df)
-df, is_cat = a.categorica_data_encoding()
+a.categorica_data_encoding()
 print(a.is_categorical)
