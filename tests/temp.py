@@ -36,15 +36,19 @@ class data_filter():
         """
         col_type = self.df.dtypes
         cat_var_index = [i for i, x in enumerate(col_type) if x == 'object']
+        col_names = list(self.df)
+
 
         # Loop over all the categorical column
         for i in cat_var_index:
 
             # Converting all the categorical value to lower case 
-            self.df[self.df.columns[i]] = self.df[self.df.columns[i]].str.lower()
+            self.df[col_names[i]] = self.df[col_names[i]].str.lower()
+            
 
             # Counting the unique value of the categorical value
-            unique_col = pd.unique(self.df[self.df.columns[i]])
+            unique_col = pd.unique(self.df[col_names[i]])
+
 
             # Condition if the unique value is 2 and replacing it with numerical
             if len(unique_col) == 2:
@@ -56,16 +60,16 @@ class data_filter():
 
                 self.is_categorical[i] = dict_unique_2
                 
-                self.df[self.df.columns[i]].replace(dict_unique_2, inplace=True)
+                self.df[col_names[i]].replace(dict_unique_2, inplace=True)
 
             # Condition if the unique value is >2 and using one hot encoding
             elif len(unique_col) > 2:
 
-                dummies_array = pd.get_dummies(self.df[self.df.columns[i]])
+                dummies_array = pd.get_dummies(self.df[col_names[i]])
 
                 self.is_categorical[i] = list(dummies_array)
 
-                self.df = self.df.drop([self.df.columns[i]], axis = 1)
+                self.df = self.df.drop([col_names[i]], axis = 1)
 
                 self.df = self.df.join(dummies_array)
 
@@ -78,5 +82,5 @@ class data_filter():
 
 df = pd.read_excel("onehot.xlsx")
 a = data_filter(df)
-a.categorica_data_encoding()
-print(a.df)
+df, is_cat = a.categorica_data_encoding()
+print(a.is_categorical)
