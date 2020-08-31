@@ -73,7 +73,8 @@ class data_filter():
 
                 self.df = self.df.join(dummies_array)
 
-
+    # def format_dataframes(Self):
+        
 
 
 
@@ -81,6 +82,7 @@ class data_filter():
 
 
 df = pd.read_excel("onehot.xlsx")
-a = data_filter(df)
-a.categorica_data_encoding()
-print(a.is_categorical)
+print(count())
+# a = data_filter(df)
+# a.categorica_data_encoding()
+# print(a.df)
