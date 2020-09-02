@@ -23,20 +23,28 @@ class data_filter():
         self.is_categorical = {}
 
 
-    def categorica_data_encoding(self):
+    def categorica_data_encoding(self, label_no = None):
         """Identify categorical features. 
 
         Parameters
         ----------
         df: original df after missing operations 
+        label_no: count of the atribute from the end of data to be treated as label
 
         Returns
         -------
-        cat_dict: summary df with col index as key which needs to be change
+        create modified df and the dict for the cateregorical data
         """
         col_type = self.df.dtypes
         cat_var_index = [i for i, x in enumerate(col_type) if x == 'object']
         col_names = list(self.df)
+
+        if label_no is None:
+            y_temp = self.df[self.df.columns[-1]]
+            x_temp = self.df.drop(self.df.columns[-1], axis=1)
+        elif isinstance(label_no, int):
+            y_temp = self.df[self.df.columns[-label_no:]]
+            x_temp = self.df.drop(self.df.columns[-label_no:], axis=1)
 
 
         # Loop over all the categorical column
@@ -82,7 +90,10 @@ class data_filter():
 
 
 df = pd.read_excel("onehot.xlsx")
-print(count())
+# print(count())
 # a = data_filter(df)
 # a.categorica_data_encoding()
 # print(a.df)
+# print(a.is_categorical)
+# print(X.head())
+# print(y.head())
