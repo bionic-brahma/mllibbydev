@@ -49,38 +49,73 @@ class data_filter():
 
         # Loop over all the categorical column
         for i in cat_var_index:
-
-            # Converting all the categorical value to lower case 
-            self.df[col_names[i]] = self.df[col_names[i]].str.lower()
             
-
-            # Counting the unique value of the categorical value
-            unique_col = pd.unique(self.df[col_names[i]])
-
-
-            # Condition if the unique value is 2 and replacing it with numerical
-            if len(unique_col) == 2:
-                dict_unique_2 = {}
-
-                # Loop for replacing each categorical value
-                for j, k in enumerate(unique_col):
-                    dict_unique_2[k] = j
-
-                self.is_categorical[i] = dict_unique_2
+            try:
+                # Converting all the categorical value to lower case 
+                x_temp[col_names[i]] = x_temp[col_names[i]].str.lower()
                 
-                self.df[col_names[i]].replace(dict_unique_2, inplace=True)
 
-            # Condition if the unique value is >2 and using one hot encoding
-            elif len(unique_col) > 2:
+                # Counting the unique value of the categorical value
+                unique_col = pd.unique(x_temp[col_names[i]])
 
-                dummies_array = pd.get_dummies(self.df[col_names[i]])
 
-                self.is_categorical[i] = list(dummies_array)
+                # Condition if the unique value is 2 and replacing it with numerical
+                if len(unique_col) == 2:
+                    dict_unique_2 = {}
 
-                self.df = self.df.drop([col_names[i]], axis = 1)
+                    # Loop for replacing each categorical value
+                    for j, k in enumerate(unique_col):
+                        dict_unique_2[k] = j
 
-                self.df = self.df.join(dummies_array)
+                    self.is_categorical[i] = dict_unique_2
+                    
+                    x_temp[col_names[i]].replace(dict_unique_2, inplace=True)
 
+                # Condition if the unique value is >2 and using one hot encoding
+                elif len(unique_col) > 2:
+
+                    dummies_array = pd.get_dummies(x_temp[col_names[i]])
+
+                    self.is_categorical[i] = list(dummies_array)
+
+                    x_temp = x_temp.drop([col_names[i]], axis = 1)
+
+                    x_temp = x_temp.join(dummies_array)
+
+            except:
+                # Converting all the categorical value to lower case 
+                y_temp[col_names[i]] = y_temp[col_names[i]].str.lower()
+                
+
+                # Counting the unique value of the categorical value
+                unique_col = pd.unique(y_temp[col_names[i]])
+
+
+                # Condition if the unique value is 2 and replacing it with numerical
+                if len(unique_col) == 2:
+                    dict_unique_2 = {}
+
+                    # Loop for replacing each categorical value
+                    for j, k in enumerate(unique_col):
+                        dict_unique_2[k] = j
+
+                    self.is_categorical[i] = dict_unique_2
+                    
+                    y_temp[col_names[i]].replace(dict_unique_2, inplace=True)
+
+                # Condition if the unique value is >2 and using one hot encoding
+                elif len(unique_col) > 2:
+
+                    dummies_array = pd.get_dummies(y_temp[col_names[i]])
+
+                    self.is_categorical[i] = list(dummies_array)
+
+                    y_temp = y_temp.drop([col_names[i]], axis = 1)
+
+                    y_temp = y_temp.join(dummies_array)
+
+            self.df = x_temp.join(y_temp)
+            
     # def format_dataframes(Self):
         
 
@@ -91,9 +126,9 @@ class data_filter():
 
 df = pd.read_excel("onehot.xlsx")
 # print(count())
-# a = data_filter(df)
-# a.categorica_data_encoding()
-# print(a.df)
-# print(a.is_categorical)
+a = data_filter(df)
+a.categorica_data_encoding()
+print(a.df)
+print(a.is_categorical)
 # print(X.head())
 # print(y.head())
