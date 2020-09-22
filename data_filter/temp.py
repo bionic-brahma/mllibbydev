@@ -1,7 +1,7 @@
 import pandas as pd
 import re
 
-class data_filter():
+class Data():
     def __init__(self, df):
         """ Identify the index column
 
@@ -20,40 +20,43 @@ class data_filter():
         else:
             self.df = df
 
-        self.is_categorical = {}
+        self.is_categorical = {}        # Storing all the categorical value
+        self.column_name = df.columns   # list conaining column name
 
 
-    def categorica_data_encoding(self, label_no = None):
+    def categorica_data_encoding(self, NumberLabel = None):
         """Identify categorical features. 
 
         Parameters
         ----------
         df: original df after missing operations 
-        label_no: count of the atribute from the end of data to be treated as label
+        NumberLabel: count of the atribute from the end of data to be treated as label
 
         Returns
         -------
-        create modified df and the dict for the cateregorical data
+        modified df and the dict for the cateregorical data
         """
         col_type = self.df.dtypes
         cat_var_index = [i for i, x in enumerate(col_type) if x == 'object']
         col_names = list(self.df)
 
-        if label_no is None:
-            y_temp = self.df[self.df.columns[-1]]
+        if NumberLabel is None:
+            y_temp = self.df[self.df.columns[-1]].to_frame()
             x_temp = self.df.drop(self.df.columns[-1], axis=1)
-        elif isinstance(label_no, int):
-            y_temp = self.df[self.df.columns[-label_no:]]
-            x_temp = self.df.drop(self.df.columns[-label_no:], axis=1)
+        elif isinstance(NumberLabel, int):
+            y_temp = self.df[self.df.columns[-NumberLabel:]]
+            x_temp = self.df.drop(self.df.columns[-NumberLabel:], axis=1)
+
+       
+        
 
 
         # Loop over all the categorical column
         for i in cat_var_index:
-            
+
             try:
-                # Converting all the categorical value to lower case 
+                # Converting all the categorical value to lower case     
                 x_temp[col_names[i]] = x_temp[col_names[i]].str.lower()
-                
 
                 # Counting the unique value of the categorical value
                 unique_col = pd.unique(x_temp[col_names[i]])
@@ -83,6 +86,7 @@ class data_filter():
                     x_temp = x_temp.join(dummies_array)
 
             except:
+                
                 # Converting all the categorical value to lower case 
                 y_temp[col_names[i]] = y_temp[col_names[i]].str.lower()
                 
@@ -115,20 +119,31 @@ class data_filter():
                     y_temp = y_temp.join(dummies_array)
 
             self.df = x_temp.join(y_temp)
-            
-    # def format_dataframes(Self):
+
+    def FormatList(Self, ListtoConvert):
+        """ Converting the list based on the data  
+
+        Parameters
+        ----------
+        ListtoConvert : list to be converted based on the 
+
+        Returns
+        -------
+        modified df and the dict for the cateregorical data
+        """
+        pass
+
         
 
 
 
         
+if __name__ == "__main__":
 
-
-df = pd.read_excel("onehot.xlsx")
-# print(count())
-a = data_filter(df)
-a.categorica_data_encoding()
-print(a.df)
-print(a.is_categorical)
-# print(X.head())
-# print(y.head())
+    df = pd.read_excel("onehot.xlsx")
+    # print(count())
+    # a = Data(df)
+    # a.categorica_data_encoding()
+    # print(a.df)
+    # print(a.is_categorical)
+    # print(df.columns[-2:])
