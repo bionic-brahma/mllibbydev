@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import copy
+import os
 
 class DataAdjust():
     def __init__(self, df):
@@ -201,4 +202,7 @@ class DataAdjust():
 
         
 if __name__ == "__main__":
-    pass
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+    path_file = os.path.join(BASE_DIR, 'data_test', 'onehot.xlsx')
+    df = pd.read_excel(path_file)
+    print(df.head())
