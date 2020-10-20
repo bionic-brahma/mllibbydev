@@ -32,7 +32,7 @@ class DataAdjust():
 
         Parameters
         ----------
-        NumberLabel is the count of lable from the end of the table
+        NumberLabel: is the count of lable from the end of the table
         df: original df after missing operations 
         NumberLabel: count of the atribute from the end of data to be treated as label
 
