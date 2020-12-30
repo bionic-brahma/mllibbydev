@@ -1,10 +1,8 @@
 
-
-
 #######################################################################################
 ## The class contains the methods related to data compression and dimension reduction.#
 ##                                                                                    #
-## Work by devendra Kumar for Lytte AI Inc.                                           #
+## Work by Devendra Kumar for Lytte AI Inc.                                           #
 #######################################################################################
 
 # begining of imports                                               ###
