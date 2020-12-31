@@ -276,10 +276,10 @@ standardX= X.copy()
 standardX['label']= Y
 
 # Writting standardization parameter file
-file_handle = open("Standardization_params_for_Thyroid_diseases.dict", 'wt')
+file_handle = open("Model\\Standardization_params_for_Thyroid_diseases.dict", 'wt')
 data = str(std_param_dics)
 file_handle.write(data)
 
 # Writing the excel file with the new dataset, ready for modelling set
-normalizedX.to_excel(excel_writer="Thyroid.xlsx",index=False)
+normalizedX.to_excel(excel_writer="DataforModels\\Thyroid.xlsx",index=False)
 
