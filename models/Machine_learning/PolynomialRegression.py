@@ -8,7 +8,7 @@
 ## Polynomial regression is progress. remaining work:                                 #
 ## applying the degree parameter to the model.                                        #
 ##                                                                                    #
-## Work by Devendra Kumar for Lytte AI Inc.                                           #
+## Work by Devendra Kumar for Risk Latte AI Inc.                                      #
 #######################################################################################
 
 
@@ -45,6 +45,11 @@ class regression:
 ##################################################################
   
     def fit(self, input_X, output_Y):
+        
+        '''
+        Work in progress
+
+        '''
         nrecords, nfeatures = input_X.shape
         
         #num_non_linear_features= self.combination(self.degree+nfeatures-1,nfeatures-1)  #m-1+nCm-1
