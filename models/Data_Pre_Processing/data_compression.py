@@ -16,9 +16,10 @@ import pandas as pd                                                 ###
 
 class DataCompression():
     '''
-    if print_msg is false. Nothing will be printed in console
+    TODO - much more to add
     '''
 
+# If print_msg is false. Nothing will be printed in console
     def __init__(self, print_msg = False):
         self.print_msg = print_msg
         
