@@ -38,22 +38,41 @@ class DataCompression():
         (Type: numpy.array) CorrMat:---> Correlation matrix of the data mtrix 'Mat'
 
         '''
+
+        # Converting Matrix to float type
         Mat= Mat.astype(np.float)
+
+        # Taking shape of matrix
         r,c= Mat.shape
+
+        # Making array to contain Std. Deviation of columns of the matrix
         Colstd= np.zeros(c).astype(np.float)
 
         # Making data as mean centralised
         for i in range(c):
+
             Mat[:,i]= Mat[:,i]- np.mean(Mat[:,i])
 
-        # Calculating covariance and correlation of data matrix 'Mat'  
+        # Finding the Std. Deviation of each column in vectorized operation  
         for i in range(c):
+
+            # This operation is only valid if the matrix is mean centralised.
+            # Its valid in this case as the mean centralisation has been done in previous step.  
             Colstd[i]= 1/(r-1) * np.sqrt(np.dot(np.transpose(Mat[:,i]),Mat[:,i]))
+
+        # Containers/Variables to hold covariance and correlation of Mat
         CovMat=np.zeros([c,c]).astype(np.float)
         CorrMat=np.zeros([c,c]).astype(np.float)
+
+        # Calculating covariance and correlation of data matrix 'Mat'
         for i in range(c):
+            
             for j in range(c):
+
+                # Covariance
                 CovMat[i][j]= 1/(r-1) * np.dot(np.transpose(Mat[:,i]),Mat[:,j])
+
+                # Correlation
                 CorrMat[i][j]= 1/(r-1) * np.dot(np.transpose(Mat[:,i]),Mat[:,j]) / (Colstd[i]*Colstd[j])
         
         return CovMat, CorrMat
