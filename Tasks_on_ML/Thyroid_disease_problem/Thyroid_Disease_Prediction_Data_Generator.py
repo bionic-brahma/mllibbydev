@@ -1,7 +1,19 @@
-#!/usr/bin/env python
-# coding: utf-8
+#######################################################################################
+## The Program is an application specific to the thyroid classification problem.      #
+##                                                                                    #
+## Work by Devendra Kumar for Risk Latte AI Inc.                                      #
+#######################################################################################
 
-# In[591]:
+#########################################
+# Please disable the next block while ammending this file so that proper
+# test can happen.
+#########################################
+
+# The block suppresses the warning on runtime
+import warnings
+warnings.filterwarnings("ignore")
+#########################################
+
 
 
 import pandas as pd
@@ -21,10 +33,16 @@ def SearchKeyInColumns(dataset, key="NaN"):
     (Type: Dictionary) column_search_freq_dictionary:---> The histogram like frequency dictionary
     '''
     
+    # Making a copy of data to maintain intrigity of original data
     data= dataset.copy()
+
+    # Taking columns name 
     cols=data.columns
+
+    # This dictionary will store columns names as key and value as frequency of the occurence of "key"
     column_search_freq_dictionary={}
     
+    # Filling up the column_search_freq_dictionary
     for i in cols:
         
         count=0
@@ -38,6 +56,7 @@ def SearchKeyInColumns(dataset, key="NaN"):
         column_search_freq_dictionary[i]= count
         
     return column_search_freq_dictionary
+
 
 # Function to filter the data by columns on key density basis. 
 def RelevanceColumnFilter(dataset, key="NaN", filter_threshold=0.8):
@@ -56,20 +75,30 @@ def RelevanceColumnFilter(dataset, key="NaN", filter_threshold=0.8):
     (Type: pandas.Dataframe) data:---> Filtered dataset after removing columns
     '''
     
+    # Getting the number of occurence of "key" column wise in Dictionary.
     dictionary= SearchKeyInColumns(dataset, key)
+
+    # Creating a copy of original data to maintain its intigrity.
     data= dataset.copy()
+
+    # This list will have column names that are not relevant for further processing. (based on threshold)
     columns_to_drop= []
+
+    # Converting the threshold to another scale range [0, total number of records in data]
     filter_threshold= filter_threshold*len(data)
     
+    # Filling columns_to_drop
     for i in dictionary.items():
         
         if i[1]>=filter_threshold:
             
             columns_to_drop.append(i[0])
     
+    # Droping the columns which have more keys than threshold. 
     data.drop(columns=columns_to_drop, inplace=True)
     
     return data
+
 
 # Function to handle missing values. 
 def ReplaceMeanAndMode(dataset, key='NaN'):
@@ -87,29 +116,50 @@ def ReplaceMeanAndMode(dataset, key='NaN'):
     (Type: pandas.DataFrame) data:---> Dataset with missing values handled.
 
     '''
-        
+
+    # Creating a copy of original data to maintain its intigrity.   
     data= dataset.copy()
+    
+    # Taking columns name 
     cols= data.columns
     
     for i in cols:    
         
+        # Converting columns to object type.
+        # Helps in maintaing uniformity in calling associated functions
         data[i]=data[i].astype(object)
         
-        if not data[i][0].isalpha():
+        try:
             
-            total=0
-            count=0
-            total= sum([float(x) for x in np.array(data[i]) if x != key])
-            count= sum([1.0 for x in np.array(data[i]) if x != key])
-            mean=total/count
-            data[i].replace(key, mean,inplace=True)
-        
-        else:
+            # Check condition for the categorical feature. Runs only for numerical entry.
+            # (Exceptional handling anabled in case data[i][0] does not have isalpha func)
+            if not data[i][0].isalpha():
+
+                total=0
+                count=0
+
+                # Calculating mean after casting entries to float.
+                total= sum([float(x) for x in np.array(data[i]) if x != key])
+                count= sum([1.0 for x in np.array(data[i]) if x != key])
+                mean=total/count
+
+                # Replacing key (missing value) with mean. 
+                data[i].replace(key, mean,inplace=True)
+
+            # This block runs for the categorical parameters
+            else:
+
+                data[i].replace(key,np.nan,inplace=True)
+
+                # Replacing missing values, ie. keys with mode of column.
+                data[i].replace(np.nan, data[i].mode(), inplace=True)
+                
+        except:
             
-            data[i].replace(key,np.nan,inplace=True)
-            data[i].replace(np.nan, data[i].mode(), inplace=True)
+            print("[X]. Raw data file is not well defiend. Reliability may get compromised")
     
     return data
+
 
 # Function to find elements of one list that are not in other list. 
 def Diff(list1, list2):
@@ -123,11 +173,11 @@ def Diff(list1, list2):
     Return:
     (Type: List()) List1-List2
     
-    '''
-    
+    '''   
     list_dif = [i for i in list1 + list2 if i not in list1 or i not in list2]
         
-    return list_dif           
+    return list_dif
+
    
 # Function to divide paramenters names in categorical and continuous types 
 def GetAttributesInCategory(dataset, target_attribute, include_target_attribute=False):
@@ -145,36 +195,57 @@ def GetAttributesInCategory(dataset, target_attribute, include_target_attribute=
     (Type: List(), List()) List with categorical attribes' names, List with continuous attributes names.
     
     '''
+
+    # Creating a copy of original data to maintain its intigrity.   
     data= dataset.copy()
+    
+    # Taking columns name 
     cols= data.columns
+    
+    # This list will have categorical attribes' names
     Nominal_cols=[]
     
     for i in cols:
-        
+
+        # Calculating mean after casting entries to float.
         data[i]=data[i].astype(object)
         
-        if include_target_attribute:
-        
-            if i != target_attribute:
-                
-                if data[i][0].isalpha():
-                    
-                    Nominal_cols.append(i)
-        
-        else:
+        try:
             
-            if data[i][0].isalpha():
-                
-                Nominal_cols.append(i)
-                
+            # If true the dependent variable or target variable will also be clossified as catogorical or numerical
+            if include_target_attribute:
+
+                if i != target_attribute:
+
+                    # Check condition for the categorical feature. Runs only for numerical entry.
+                    # (Exceptional handling anabled in case data[i][0] does not have isalpha func)
+                    if data[i][0].isalpha():
+
+                        Nominal_cols.append(i)
+
+            # If target variable is excempted.
+            else:
+
+                # Check condition for the categorical feature. Runs only for numerical entry.
+                # (Exceptional handling anabled in case data[i][0] does not have isalpha func)
+                if data[i][0].isalpha():
+
+                    Nominal_cols.append(i)
+        except:
+            
+            print("[X]. Raw data file is not well defiend. Reliability may get compromised")        
+    
     templist=Nominal_cols.copy()
+
+    # Now templist will have the categorical column names and name of target variable
     templist.append(target_attribute)
     
+    # The scond return value is the name of the columns with numerical entries.
     return Nominal_cols, Diff(list(data.columns.values),templist)
+
 
 # Function to change the type of cloumns of the dataset
 def ChangeType(dataset, cols):
-    
     
     '''Changes the type of columns in float64 dtype
     
@@ -187,10 +258,12 @@ def ChangeType(dataset, cols):
     
     '''
     
+    # Creating a copy of original data to maintain its intigrity.
     data= dataset.copy()  
     
     for i in cols:
         
+        # Changing type of each column into float64
         data[i]=data[i].astype(float)
     
     return data
@@ -212,8 +285,10 @@ def standardization(X, record_param= True):
     (Type: dict={ Name of attribute : tuple(mean, std. deviation)) data:---> Disctionary of parameters of standardization.
     
     '''
-  
+    # Getting column names
     Columns=X.columns
+
+    # This dictionary will store the paramenters used in standardization process
     Standardization_parameters={}
     
     for i in Columns:
@@ -221,27 +296,34 @@ def standardization(X, record_param= True):
         p= np.array(X[i])
         mean_of_data= np.mean(p)
         std_devi_of_data= np.std(p)
+
+        # performing standardization column wise
         X[i]= [(x - mean_of_data)/std_devi_of_data for x in p]
         
+        # Removing columns(features) which have no deviation throughout.
         if std_devi_of_data == 0:
             
             X.drop(i,axis=1,inplace=True)
             
         else:
             
+            # Writting on dictionary, the params for column
             Standardization_parameters[i]= (mean_of_data,std_devi_of_data)
-            
+
+    # Only returns the Standardization_parameters if record_param is true.        
     if record_param:
         
         return Standardization_parameters
     
     
 ##    
-## Specific to thyroid dataset    
+## Rest code is specific to thyroid dataset    
 ##
     
 # Loading dataset. 
 data= pd.read_csv("Data/allbp.data")
+
+# Giving the column names
 data.columns= ["age","sex","on_thyroxine","query_on_thyroxine","on_antithyroid_medication","sick","pregnant","thyroid_surgery","I131_treatment", "query_hypothyroid","query_hyperthyroid","lithium","goitre","tumor","hypopituitary","psych","TSH_measured","TSH","T3_measured","T3","TT4_measured","TT4","T4U_measured","T4U","FTI_measured","FTI","TBG_measured","TBG","Referral_source", "Class"]
 
 # Parsing the class attribute to get class
@@ -276,10 +358,11 @@ standardX= X.copy()
 standardX['label']= Y
 
 # Writting standardization parameter file
-file_handle = open("Model\\Standardization_params_for_Thyroid_diseases.dict", 'wt')
+file_handle = open("Model/Standardization_params_for_Thyroid_diseases.dict", "w+")
 data = str(std_param_dics)
 file_handle.write(data)
 
 # Writing the excel file with the new dataset, ready for modelling set
-normalizedX.to_excel(excel_writer="DataforModels\\Thyroid.xlsx",index=False)
+standardX.to_excel(excel_writer="DataforModels/Thyroid.xlsx",index=False)
 
+################################# End of File ###################################
