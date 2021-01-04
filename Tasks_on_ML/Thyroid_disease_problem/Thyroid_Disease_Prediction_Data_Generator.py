@@ -361,6 +361,7 @@ standardX['label']= Y
 file_handle = open("Model/Standardization_params_for_Thyroid_diseases.dict", "w+")
 data = str(std_param_dics)
 file_handle.write(data)
+file_handle.close()
 
 # Writing the excel file with the new dataset, ready for modelling set
 standardX.to_excel(excel_writer="DataforModels/Thyroid.xlsx",index=False)
