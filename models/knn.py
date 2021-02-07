@@ -1,6 +1,5 @@
 ######################################################################
-# This is the decision tree algorithm. Branch division is based on the
-# Entropy method.
+# This is the KNN.
 # Created in collaboration for Risk Latte Americas Inc.
 ######################################################################
 
