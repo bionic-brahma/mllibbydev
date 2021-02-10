@@ -4,17 +4,17 @@ e = 2.718
 
 
 def activfunc(Z, activation_type='ReLU', deri=False):
-    '''activates the output of the neurons in neural network
+    """activates the output of the neurons in neural network
 
-    
+
         Parameters:
         (Type: numpy array) Z:---> sum added weight times input of neuron
         (Type: String) type:---> type of activation fucntion to be used in network, ReLU/ LeakyReLu/ Sigmoid/Gaussian/Tanh/Sinc/Bentid/Sinusoid/Softmax/Swish/SoftPlus/Linear/Softsign
         (Type: float) deri:---> is derivate true: use derivated activation fucntion .
-    
+
         Return:
-        (Type: numpy array) 
-    '''
+        (Type: numpy array)
+    """
 
     if activation_type == 'ReLU':
         if deri:
