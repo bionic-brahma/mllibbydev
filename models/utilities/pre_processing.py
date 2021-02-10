@@ -146,6 +146,7 @@ def ReplaceMeanAndMode(dataset, key='NaN'):
 
         except:
 
+            print("Function in error: pre_processing.ReplaceMeanAndMode")
             print("[x]. Raw data file is not well defend. Reliability may get compromised")
 
     return data
@@ -218,6 +219,7 @@ def GetAttributesInCategory(dataset, target_attribute, include_target_attribute=
                     nominal_cols.append(i)
         except:
 
+            print("Function in error: pre_processing.GetAttributesInCategory")
             print("[x]. Raw data file is not well defend. Reliability may get compromised")
 
     templist = nominal_cols.copy()
@@ -309,9 +311,11 @@ def OneHotEncoding(column_name, dataset_in_df_form):
     unique_values = np.unique(dataset_in_df_form[column_name])
 
     for unique_value in unique_values:
-        new_column = np.where(unique_value == dataset_in_df_form[column_name], 1, 0)
-        dataset_in_df_form[column_name + "_" + str(unique_value)] = new_column
-
+        try:
+            new_column = np.where(unique_value == dataset_in_df_form[column_name], 1, 0)
+            dataset_in_df_form[column_name + "_" + str(unique_value)] = new_column
+        except Exception as e:
+            print("[X] Error in function: pre_processing.OneHotEncoding\n", e)
     return dataset_in_df_form
 
 ################################# End of File ###################################

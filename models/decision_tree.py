@@ -73,7 +73,7 @@ class DecisionTree:
         """
         Fits the tree as per the training data.
         :param X: Feature matrix of the data.
-        :param y: Data lebels for the corresponding feature matrix
+        :param y: Data labels for the corresponding feature matrix
         :return: None
         """
         self.n_feats = X.shape[1] if not self.n_feats else min(self.n_feats, X.shape[1])

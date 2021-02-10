@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 
-def train_test_split(df, test_size=0.2, output_seperated='yes', label_name='label'):
+def train_test_split_df(df, test_size=0.2, output_seperated='yes', label_name='label'):
     """
     ************** PARAMETER ***************
     df = dataset
@@ -30,8 +30,8 @@ def train_test_split(df, test_size=0.2, output_seperated='yes', label_name='labe
 
     ************  EXAMPLE ****************
 
-    train, test = train_test_split(df,0.7,'no')
-    xtest, xtrain,ytest,ytrain= train_test_split(df,0.7,'yes','label')
+    train, test = train_test_split_df(df,0.7,'no')
+    xtest, xtrain,ytest,ytrain= train_test_split_df(df,0.7,'yes','label')
     """
     try:
         df = df.dropna()  # dropping empty columns
@@ -110,3 +110,41 @@ def cross_validation_split(df, folds=5):
         train_fold.append(train_df)  # list containing list of data for train
 
     return test_fold, train_fold
+
+
+def shuffle_data(X, y, seed=None):
+    """
+    Function for shuffling the data
+    :param X: Input feature matrix
+    :param y: list of the labels for the input matrix
+    :param seed: seed for random function
+    :return: suffled input feature matrix and shuffled label list
+    """
+
+    if seed:
+        np.random.seed(seed)
+
+    indices = np.arange(X.shape[0])
+    np.random.shuffle(indices)
+
+    return X[indices], y[indices]
+
+
+def train_test_split(X, y, test_size=0.3, shuffle=True):
+    """
+    The method is to split the give feature matrix and the labels for that
+    into training and testing datasets.
+    :param shuffle: If true the dataset indices will be shuffled before the splitting
+    :param X: Feature matrix
+    :param y: Labels for the featur matrix
+    :param test_size: The relative size of the test dataset
+    :return: train_X, train_y, test_X, test_y
+    """
+    if shuffle:
+        X, y = shuffle_data(X, y, random.randint(1, 1000))
+
+    number_of_train_records = len(y) - int(len(y) // (1 / test_size))
+    train_X, test_X = X[:number_of_train_records], X[number_of_train_records:]
+    train_y, test_y = y[:number_of_train_records], y[number_of_train_records:]
+
+    return train_X, test_X, train_y, test_y

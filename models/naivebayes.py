@@ -1,6 +1,6 @@
 ######################################################################
-# This is the Naive Bayes algorithm.
-# 
+# This is the decision tree algorithm. Branch division is based on the
+# Entropy method.
 # Created in collaboration for Risk Latte Americas Inc.
 ######################################################################
 
