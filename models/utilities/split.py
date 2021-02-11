@@ -138,7 +138,7 @@ def train_test_split(X, y, test_size=0.3, shuffle=True):
     :param X: Feature matrix
     :param y: Labels for the featur matrix
     :param test_size: The relative size of the test dataset
-    :return: train_X, train_y, test_X, test_y
+    :return: train_X, test_X, train_y,  test_y
     """
     if shuffle:
         X, y = shuffle_data(X, y, random.randint(1, 1000))

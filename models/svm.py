@@ -1,3 +1,8 @@
+########################################################
+# Support vector machine by collaboration
+# for Risk Latte Americas Inc.
+########################################################
+
 import numpy as np
 import json
 import ast
@@ -6,6 +11,13 @@ import ast
 class SVM:
 
     def __init__(self, learning_rate=0.001, lambda_param=0.01, n_iters=1000):
+        """
+        This the constructor for SVM class.
+
+        :param learning_rate: step size for weights and bias to update.
+        :param lambda_param: Lagrange multiplies' value
+        :param n_iters:  Number of iterations for training
+        """
         self.lr = learning_rate
         self.lambda_param = lambda_param
         self.n_iters = n_iters
@@ -13,6 +25,12 @@ class SVM:
         self.b = None
 
     def fit(self, X, y):
+        """
+        Fits the tree as per the training data.
+        :param X: Feature matrix of the data. format--> [[1st rec], [2nd record],...]
+        :param y: Data labels for the corresponding feature matrix. format [1st label, 2nd label,...]
+        :return: None
+        """
         n_samples, n_features = X.shape
 
         y_ = np.where(y <= 0, -1, 1)
@@ -30,10 +48,20 @@ class SVM:
                     self.b -= self.lr * y_[idx]
 
     def predict(self, X):
+        """
+        Make the classification for the give input feature vector
+        :param X: Feature vector to make classification on
+        :return: Label for the feature vector
+        """
         approx = np.dot(X, self.w) - self.b
         return np.sign(approx)
 
     def Save_Model(self, file_name):
+        """
+        This function saves the trained model in .json format.
+        :param file_name: File name (Without extension) along with the location address to save the model.
+        :return:
+        """
 
         model_data = {"model_param": str([self.w.tolist(), self.b])}
         model_file = file_name + str(".json")
@@ -46,9 +74,13 @@ class SVM:
             with open(model_file, 'w') as modelfile:
                 json.dump(model_data, modelfile, indent=4)
                 print("model_saved sucessfully in file named : ", model_file)
-        return
 
     def Load_Model(self, file_name):
+        """
+        This function loads the already saved trained model.
+        :param file_name: location along with the file name(with extension)
+        :return: Boolean value, true is model loaded successfully or else false.
+        """
 
         try:
 

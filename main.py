@@ -1,19 +1,23 @@
-from sklearn import datasets
-
+import numpy as np
+from models.svm import SVM
 from models.utilities.split import train_test_split
 from models.utilities.performance_matrices import accuracy
-from models.random_forest import RandomForest
 
-data = datasets.load_breast_cancer()
-X = data.data
-y = data.target
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+X = np.array([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [6, 8], [2, 1], [5, 1], [8, 4], [9, 6]])
+y = np.array([1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0])
+y = np.where(y == 0, -1, 1)
 
-clf = RandomForest(n_trees=3, max_depth=10)
+trainx, testx, trainy, testy = train_test_split(X, y)
 
-clf.fit(X_train, y_train)
-y_pred = clf.predict(X_test)
-acc = accuracy(y_test, y_pred)
+clf = SVM()
+print(trainy)
+clf.fit(trainx, trainy)
+predictions = clf.predict(testx)
+print(predictions)
+print(testy)
 
-print ("Accuracy:", acc)
+print(accuracy(testy, predictions))
+
+
+
