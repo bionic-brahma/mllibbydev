@@ -1,12 +1,9 @@
-import sys
 import numpy as np
 import pandas as pd
-from utilities.normalization import normal_norm
-
-sys.path.insert(1, '../utilities')
+from models.utilities.normalization import normal_norm
 
 
-class Knn:
+class KNN:
 
     def __init__(self, data, algo_name="knn_weighted_psm", predict_label='label', forecast_input_attributes=0):
 
@@ -74,6 +71,12 @@ class Knn:
             print(forecast_result)
 
     def euclideanDistance(self, a, b):
+        """
+        Calculates the Euclidiean distance between two points
+        :param a: first point
+        :param b: second point
+        :return: euclidean distance between first point and the second point
+        """
         dist = np.linalg.norm(a - b)
         return dist
 
@@ -89,6 +92,7 @@ class Knn:
         return self.Srt_np(similarity)
 
     # compute patient similarity matrix of v1 to v2: (v1 dot v2)/{||v1||*||v2||)
+    # this is the direction/orientation similarity
     def PSM(self, v1, v2):
         return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v1))
 

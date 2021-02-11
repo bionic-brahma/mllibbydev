@@ -1,12 +1,10 @@
 #######################################################################################
 ## Logistic regression to work on binary classification                               #
-##                                                                                    #
-##                                                                                    #
 ## Work by Devendra Kumar for Risk Latte AI Inc.                                      #
 #######################################################################################
 import sys
 import numpy as np
-from utilities.Activations import activfunc
+from models.utilities.Activations import activfunc
 sys.path.insert(1, '../utilities')
 
 

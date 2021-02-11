@@ -318,4 +318,14 @@ def OneHotEncoding(column_name, dataset_in_df_form):
             print("[X] Error in function: pre_processing.OneHotEncoding\n", e)
     return dataset_in_df_form
 
+
+def convlist(a):
+    """
+    Converts the iterable element into a list.
+    :param a: the iterable variable
+    :return:  list having the elements of the iterable variable
+    """
+    if type(a) is not list():
+        return [x for x in a]
+    return a
 ################################# End of File ###################################
