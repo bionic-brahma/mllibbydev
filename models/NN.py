@@ -1,113 +1,166 @@
-import sys
-
+from tqdm import tqdm
 import numpy as np
-from utilities.Activations import activfunc
-
-sys.path.insert(1, '../utilities')
-
-np.random.seed(1)
+from models.utilities.Activations import activfunc
 
 
-class ANN:
-    def __init__(self, x, y, learning_rate=0.001, layer_neurons=None):
+def cross_entropy(label, prediction):
+    """
+    Cross Entropy loss function
+    :param label: list of actual labels
+    :param prediction: list of predicted labels
+    :return: cross entropy
+    """
+
+    product = np.multiply(prediction, label)
+    temp = product[product != 0]
+    entropy = -np.log(temp)
+    _cross_entropy = np.mean(entropy)
+
+    return _cross_entropy
+
+
+class NeuralNet:
+
+    def __init__(self, n_inputs=None, n_outputs=None, hidden_layers=None, activations_for_layers=None):
+
         """
-        This is a 4 layer neural network 1st layer is input layer, 2nd layer is hidden layer with 12  neurons
-        3rd layer is hidden layer with  32 neurons, 4th layer is output layer with number of neurons equals
-        to 1 if not multiclass, else neurons are equal to no. of different labels(if multiple labels).
+        This is the constrictor of the NeuralNet class.
+        all the parameters are optional.
+
+        :param: n_inputs: The total number of records in the dataset
+        :param: n_outputs: The total number of classes or labels
+        :param: hidden_layers: list where length of list gives the number of hidden layers and ith entry in the list
+                indicates the number of neurons present in the ith hidden layer.
+        :param: activations_for_layers: The list containing the activation functions for hidden layers
+                Ex: ['ReLu', 'Softmax', 'Sigmoid', 'SoftPlus', 'Swish', 'Linear']  this is for a six hidden layer
+                network. Its just an example without relevance of applicability.
+                If nothing is provided. The 'LeakyReLU' will be used by default.
+        :variable: W: Weights assigned to the layers
+        :variable: B: Bias assigned to the layers"""
+
+        if hidden_layers is None:
+            hidden_layers = [5, 5, 3]
+
+        self.number_of_Inputs = n_inputs
+        self.number_of_Outputs = n_outputs
+        self.Number_Hidden_Layers = len(hidden_layers)
+        self.sizes = [self.number_of_Inputs] + hidden_layers + [self.number_of_Outputs]
+        self.Weights = []
+        self.Bias = []
+
+        for i in range(self.Number_Hidden_Layers + 1):
+
+            # random weights initialization
+            self.Weights[i + 1] = np.random.randn(self.sizes[i], self.sizes[i + 1])
+
+            # bias initialization to 0
+            self.Bias[i + 1] = np.zeros((1, self.sizes[i + 1]))
+
+    def neural_architecture(self, x):
         """
-        if layer_neurons is None:
-            layer_neurons = [12, 32, 1]
+        Creates the architecture for the neural net with the parameters given in the class
+        constructor.
+        :param: x: Number of inputs flattened
+        :param: Layer_Output: It gives dot product of H(Inputs) and W(Weights) Which is added to vector B(Bias)
+        :return: last output layers
+        """
+        self.Layer_Output = []
+        self.Flattened_Input = []
+        self.Flattened_Input[0] = x.reshape(1, -1)
 
-        self.input = x  # input data without output labels
-        self.y = y  # input data of labels
+        for i in range(self.Number_Hidden_Layers):
 
-        self.output = np.zeros(self.y.shape)
-        self.learning_rate = learning_rate  # learning rate for neural network
+            self.Layer_Output[i + 1] = np.matmul(self.Flattened_Input[i], self.Weights[i + 1]) + self.Bias[i + 1]
+            self.Flattened_Input[i + 1] = activfunc((self.Layer_Output[i + 1], 'LeakyReLU'))
 
-        labels = np.unique(y)
-        self.no_of_labels = len(labels)
+        self.Layer_Output[self.Number_Hidden_Layers + 1] = np.matmul(self.Flattened_Input[self.Number_Hidden_Layers], self.Weights[self.Number_Hidden_Layers + 1]) + self.Bias[self.Number_Hidden_Layers + 1]
 
-        # for multiclass if labels are strings, then converting them into non string values.
-        self.new_y = self.y
-        for i in range(len(self.new_y)):
-            a = list()
-            self.new_y[i] = list(labels).index(self.new_y[i])
+        if self.number_of_Outputs > 1:
 
-        # defining one hot labels if multiclass
-        if self.no_of_labels > 2:
-            self.one_hot_labels = np.zeros((x.shape[0], self.no_of_labels))
-            for i in range(x.shape[0]):
-                self.one_hot_labels[i, self.new_y[i][0]] = 1
+            self.Flattened_Input[self.Number_Hidden_Layers + 1] = activfunc(self.Layer_Output[self.Number_Hidden_Layers + 1], 'Softmax')
 
-        # Neural layers parameters
-        self.weights1 = np.random.randn(x.shape[1], layer_neurons[0])  # weights for layer 1
-        self.bais1 = np.random.randn(1, layer_neurons[0])  # biases for layer 1
-        self.layer1_fx = 'Sigmoid'  # activation function used in layer 1
-
-        self.weights2 = np.random.randn(layer_neurons[0], layer_neurons[1])  # weights for layer 2
-        self.bais2 = np.random.randn(1, layer_neurons[1])  # # biases for layer 2
-        self.layer2_fx = 'Sigmoid'  # activation function used in layer 2
-
-        # output layer parameters if multiclass classification
-        if self.no_of_labels > 2:
-            self.weights3 = np.random.randn(layer_neurons[1], self.no_of_labels)  # weights for layer 3
-            self.bais3 = np.random.randn(1, self.no_of_labels)  # biases for layer 3
-            self.layer3_fx = 'Softmax'  # activation function used in layer 3
-        # if not  multiclass classification
         else:
-            self.weights3 = np.random.randn(layer_neurons[1], layer_neurons[2])
-            self.bais3 = np.random.randn(1, layer_neurons[2])
-            self.layer3_fx = 'Sigmoid'
 
-    def feedforward(self):
-        self.layer1 = activfunc(np.dot(self.input, self.weights1) + self.bais1, activation_type=self.layer1_fx)
-        self.layer2 = activfunc(np.dot(self.layer1, self.weights2) + self.bais2, activation_type=self.layer2_fx)
-        self.output = activfunc(np.dot(self.layer2, self.weights3) + self.bais3, activation_type=self.layer3_fx)
+            self.Flattened_Input[self.Number_Hidden_Layers + 1] = activfunc(self.Layer_Output[self.Number_Hidden_Layers + 1], 'Sigmoid')
 
-    def backprop(self):
-        # delta3 = 2*(self.y - self.output) * sigmoid_derivative(self.output)
+        return self.Flattened_Input[self.Number_Hidden_Layers + 1]
 
-        # if multiclass
-        if self.no_of_labels > 2:
-            error = self.output - self.one_hot_labels
-            delta3 = (error) * activfunc(self.output, activation_type='Softmax', deri=True)
+    def backpropagation(self, x, y):
+        """
+        Function performing the backpropagation to update weights
 
-            # if not multiclass
-        else:
-            error = self.y - self.output
-            delta3 = (error) * activfunc(self.output, activation_type='Sigmoid', deri=True)
+        :param: x: Input data matrix (all entries should be numerical)
+        :param: y: Output data labels
 
-        d_weights3 = np.dot(self.layer2.T, delta3)
+        """
+        self.neural_architecture(x)
+        self.dWeights = []
+        self.dBias = []
+        self.dFlattened_Input = []
+        self.dLayer_Output = []
+        L = self.Number_Hidden_Layers + 1
+        self.dLayer_Output[L] = (self.Flattened_Input[L] - y) ** 2
 
-        delta2 = np.dot(delta3, self.weights3.T) * activfunc(self.layer2, activation_type='Sigmoid', deri=True)
-        d_weights2 = np.dot(self.layer1.T, delta2)
+        for k in range(L, 0, -1):
 
-        # delta1 = np.dot(delta2,self.weights2.T) * sigmoid_derivative(self.layer1)
-        delta1 = np.dot(delta2, self.weights2.T) * activfunc(self.layer1, activation_type='Sigmoid', deri=True)
-        d_weights1 = np.dot(self.input.T, delta1)
+            self.dWeights[k] = np.matmul(self.Flattened_Input[k - 1].T, self.dLayer_Output[k])
+            self.dBias[k] = self.dLayer_Output[k]
 
-        self.weights1 += d_weights1 * self.learning_rate
-        self.weights2 += d_weights2 * self.learning_rate
-        self.weights3 += d_weights3 * self.learning_rate
+            self.dFlattened_Input[k - 1] = np.matmul(self.dLayer_Output[k], self.Weights[k].T)
+            self.dLayer_Output[k - 1] = np.multiply(self.dFlattened_Input[k - 1], activfunc(self.Flattened_Input[k - 1],'Softmax', deri=True))
 
-    def train(self, epoch=5000):
-        print("Training network {} times".format(epoch))
-        for i in range(epoch):
-            self.feedforward()
-            self.backprop()
-        print("Training completed")
+    def fit(self, X, Y, epochs=100, initialize='True', learning_rate=0.001, display_loss=True):
 
-    def predict(self, values):
-        layer1 = activfunc(np.dot(values, self.weights1) + self.bais1, activation_type=self.layer1_fx)
-        layer2 = activfunc(np.dot(layer1, self.weights2) + self.bais2, activation_type=self.layer2_fx)
-        output = activfunc(np.dot(layer2, self.weights3) + self.bais3, activation_type=self.layer3_fx)
-        return output
+        """
+        Function for fitting the train data to the neural network( Making the neural network learn)
+        :param: X: training data of the input variable
+        :param: Y: training data of the output variable
+        :param: epochs: Number of iteration to be performed till the model converges
+        :param: learning_rate: This value tells us how fast the model learns about the data,
+        :param: display_loss: It displays the loss in the model
 
-    '''
-    ************ Using this Neural Network *********
-    
-    nn=ANN(X,labels)
-    nn.train()
-    print(nn.predict(values))
-    
-    '''
+        """
+        self.number_of_Inputs = X.shape[0]
+        if initialize:
+            for i in range(self.Number_Hidden_Layers + 1):
+                self.Weights[i + 1] = np.random.randn(self.sizes[i],
+                                                      self.sizes[i + 1])  # Model initialisation with random weights
+                self.Bias[i + 1] = np.zeros(
+                    (1, self.sizes[i + 1]))  # Model initialization with bias vector containing 0
+
+        for epoch in tqdm(range(epochs), total=epochs, unit="epoch"):
+
+            dWeights = []
+            dBias = []
+            for i in range(self.Number_Hidden_Layers + 1):
+                dWeights[i + 1] = np.zeros((self.sizes[i], self.sizes[i + 1]))
+                dBias[i + 1] = np.zeros((1, self.sizes[i + 1]))
+            for x, y in zip(X, Y):
+                self.backpropagation(x, y)
+                for i in range(self.Number_Hidden_Layers + 1):
+                    dWeights[i + 1] += self.dWeights[i + 1]
+                    dBias[i + 1] += self.dBias[i + 1]
+
+            m = X.shape[1]
+            for i in range(self.Number_Hidden_Layers + 1):
+                self.Weights[i + 1] -= learning_rate * (dWeights[i + 1] / m)
+                self.Bias[i + 1] -= learning_rate * (dBias[i + 1] / m)
+
+            if display_loss:
+                """ Loss value is displayed which is cross entropy value"""
+                loss = []
+                Y_pred = self.predict(X)
+                loss[epoch] = cross_entropy(Y, Y_pred)
+                print(loss[epoch])
+
+    def predict(self, X):
+        """ Function of the neural network used for predicting the test cases or validation cases
+        :param: X: Input Column or variable( Input test data)
+        :variable Y_pred: Predicted output when predict function is used on the test data"""
+        Y_pred = []
+        for x in X:
+            y_pred = self.neural_architecture(
+                x)  # Sending the test data into the neural network and storing the output obtained in the Y_pred
+            Y_pred.append(y_pred)
+        return np.array(Y_pred).squeeze()
+    # ************ Using this Neural Network *********
