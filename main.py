@@ -1,31 +1,19 @@
-from sklearn import datasets
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
-from models.knn import KNN
-from models.utilities.performance_matrices import accuracy
+import numpy as np
+from models.utilities import split, performance_matrices
+from models.decision_tree import DecisionTree
 
-cmap = ListedColormap(['#FF0000', '#00FF00', '#0000FF'])
 
-iris = datasets.load_iris()
-X, y = iris.data, iris.target
+X = np.array([[1,2,3], [5,2,3], [1,2,5], [1,6,3], [1,5,3], [5,2,6], [5,6,3]])
+y = np.array([1,1,1,0,0,0,1])
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1234)
+X_train, X_test, y_train, y_test = split.train_test_split(X, y, test_size=0.2)
+print(X_train)
+print("*******************\n",y_train)
 
-print(X_train.shape)
-print(X_train[0])
-
-print(y_train.shape)
-print(y_train)
-
-plt.figure()
-plt.scatter(X[:, 0], X[:, 1], c=y, cmap=cmap, edgecolor='k', s=20)
-plt.show()
-
-k = 5
-clf = KNN(k=k)
+clf = DecisionTree(max_depth=5)
 clf.fit(X_train, y_train)
-predictions = clf.predict(X_test)
-print("custom KNN classification accuracy", accuracy(y_test, predictions))
-acc = accuracy(y_test, predictions)
+
+y_pred = clf.predict(X_test)
+acc = performance_matrices.accuracy(y_test, y_pred)
+
 print("Accuracy:", acc)

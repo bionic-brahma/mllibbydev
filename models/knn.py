@@ -1,5 +1,6 @@
 ######################################################################
-# K - nearest neighbor algorithm
+# This is the decision tree algorithm. Branch division is based on the
+# Entropy method.
 # Created in collaboration for Risk Latte Americas Inc.
 ######################################################################
 
@@ -50,7 +51,6 @@ class KNN:
         """
 
         y_pred = [self.hypothisize(x) for x in X]
-
         return np.array(y_pred)
 
     def hypothisize(self, x):
@@ -67,5 +67,4 @@ class KNN:
         k_neighbor_labels = [self.y_train[i] for i in k_idx]
         # return common label
         most_common = Counter(k_neighbor_labels).most_common(1)
-
         return most_common[0][0]
