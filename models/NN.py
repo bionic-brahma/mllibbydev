@@ -1,3 +1,14 @@
+##########################################################
+#  The neural network by Devendra in collaboration
+#  for Risk Latte Americas Inc.
+##########################################################
+
+#
+ #    Please do consider testing with many datasets and
+#            provide feedback
+ #
+
+import sys
 from tqdm import tqdm
 import numpy as np
 from models.utilities.Activations import activfunc
@@ -38,12 +49,13 @@ class NeuralNet:
         :variable: W: Weights assigned to the layers
         :variable: B: Bias assigned to the layers"""
 
-        self.Flattened_Input = []
-        self.Layer_Output = []
-        self.dLayer_Output = []
-        self.dFlattened_Input = []
-        self.dBias = []
-        self.dWeights = []
+        self.loss = {}
+        self.Flattened_Input = {}
+        self.Layer_Output = {}
+        self.dLayer_Output = {}
+        self.dFlattened_Input = {}
+        self.dBias = {}
+        self.dWeights = {}
         if hidden_layers is None:
             hidden_layers = [5, 5, 3]
 
@@ -51,8 +63,8 @@ class NeuralNet:
         self.number_of_Outputs = n_outputs
         self.Number_Hidden_Layers = len(hidden_layers)
         self.sizes = [self.number_of_Inputs] + hidden_layers + [self.number_of_Outputs]
-        self.Weights = []
-        self.Bias = []
+        self.Weights = {}
+        self.Bias = {}
 
         for i in range(self.Number_Hidden_Layers + 1):
 
@@ -74,7 +86,8 @@ class NeuralNet:
         for i in range(self.Number_Hidden_Layers):
 
             self.Layer_Output[i + 1] = np.matmul(self.Flattened_Input[i], self.Weights[i + 1]) + self.Bias[i + 1]
-            self.Flattened_Input[i + 1] = activfunc((self.Layer_Output[i + 1], 'LeakyReLU'))
+
+            self.Flattened_Input[i + 1] = activfunc(self.Layer_Output[i + 1], 'LeakyReLU')
 
         self.Layer_Output[self.Number_Hidden_Layers + 1] = np.matmul(self.Flattened_Input[self.Number_Hidden_Layers], self.Weights[self.Number_Hidden_Layers + 1]) + self.Bias[self.Number_Hidden_Layers + 1]
 
@@ -110,9 +123,12 @@ class NeuralNet:
             self.dBias[k] = self.dLayer_Output[k]
 
             self.dFlattened_Input[k - 1] = np.matmul(self.dLayer_Output[k], self.Weights[k].T)
-            self.dLayer_Output[k - 1] = np.multiply(self.dFlattened_Input[k - 1], activfunc(self.Flattened_Input[k - 1],'Softmax', deri=True))
+            if k ==  L-1:
+                self.dLayer_Output[k - 1] = np.multiply(self.dFlattened_Input[k - 1], activfunc(self.Flattened_Input[k - 1],'Softmax', deri=True))
+            else:
+                self.dLayer_Output[k - 1] = np.multiply(self.dFlattened_Input[k - 1], activfunc(self.Flattened_Input[k - 1],'LeakyReLU', deri=True))
 
-    def fit(self, X, Y, epochs=100, initialize='True', learning_rate=0.001, display_loss=False):
+    def fit(self, X, Y, epochs=100, initialize_with_random_weights='True', learning_rate=0.001, show_loss=False):
 
         """
         Function for training neural network using the data given.
@@ -121,22 +137,22 @@ class NeuralNet:
         :param: Y: list of the lables for the feature matrix
         :param: epochs: Number of iteration to be performed by the network
         :param: learning_rate: The step value, it decides how much to move at every iteration
-        :param: display_loss: It displays the loss in the model
+        :param: show_loss: It displays the loss in the model
 
         """
         self.number_of_Inputs = X.shape[0]
 
-        if initialize:
+        if initialize_with_random_weights:
 
             for i in range(self.Number_Hidden_Layers + 1):
 
                 self.Weights[i + 1] = np.random.randn(self.sizes[i], self.sizes[i + 1])
                 self.Bias[i + 1] = np.zeros((1, self.sizes[i + 1]))
 
-        for epoch in tqdm(range(epochs), total=epochs, unit="epoch"):
+        for epoch in tqdm(range(epochs), file=sys.stdout, unit="epoch", desc="Training"):
 
-            dWeights = []
-            dBias = []
+            dWeights = {}
+            dBias = {}
 
             for i in range(self.Number_Hidden_Layers + 1):
 
@@ -159,14 +175,13 @@ class NeuralNet:
                 self.Weights[i + 1] -= learning_rate * (dWeights[i + 1] / m)
                 self.Bias[i + 1] -= learning_rate * (dBias[i + 1] / m)
 
-            if display_loss:
+            if show_loss:
                 """ 
                 Loss value is displayed which is cross entropy value
                 """
-                loss = []
                 Y_pred = self.predict(X)
-                loss[epoch] = cross_entropy(Y, Y_pred)
-                print(loss[epoch])
+                self.loss[epoch] = cross_entropy(Y, Y_pred)
+                print("Loss:", self.loss[epoch])
 
     def predict(self, X):
         """

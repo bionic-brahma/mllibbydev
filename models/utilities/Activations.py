@@ -2,6 +2,7 @@ import numpy as np
 
 e = 2.718
 
+
 def activfunc(Z, activation_type='ReLU', deri=False):
     """
         Activates the output of the neurons in neural network
@@ -22,9 +23,9 @@ def activfunc(Z, activation_type='ReLU', deri=False):
 
     if activation_type == 'LeakyReLU':
         if deri:
-            return 0.01 if Z < 0 else 1
+            return np.where(Z < 0, 0.01, 1)
         else:
-            return Z * 0.01 if Z < 0 else Z
+            return np.where(Z < 0, Z * 0.01, Z)
 
     elif activation_type == 'Sigmoid':
         if deri:
