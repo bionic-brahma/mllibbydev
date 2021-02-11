@@ -38,6 +38,12 @@ class NeuralNet:
         :variable: W: Weights assigned to the layers
         :variable: B: Bias assigned to the layers"""
 
+        self.Flattened_Input = []
+        self.Layer_Output = []
+        self.dLayer_Output = []
+        self.dFlattened_Input = []
+        self.dBias = []
+        self.dWeights = []
         if hidden_layers is None:
             hidden_layers = [5, 5, 3]
 
@@ -62,10 +68,7 @@ class NeuralNet:
         constructor.
         :param: x: Number of inputs flattened
         :param: Layer_Output: It gives dot product of H(Inputs) and W(Weights) Which is added to vector B(Bias)
-        :return: last output layers
         """
-        self.Layer_Output = []
-        self.Flattened_Input = []
         self.Flattened_Input[0] = x.reshape(1, -1)
 
         for i in range(self.Number_Hidden_Layers):
@@ -93,13 +96,13 @@ class NeuralNet:
         :param: y: Output data labels
 
         """
+        # creating and initialising the neural net with weights and biases along with input.
         self.neural_architecture(x)
-        self.dWeights = []
-        self.dBias = []
-        self.dFlattened_Input = []
-        self.dLayer_Output = []
+
         L = self.Number_Hidden_Layers + 1
-        self.dLayer_Output[L] = (self.Flattened_Input[L] - y) ** 2
+
+        # It contains the differentiation of the loss calculated at the last layer
+        self.dLayer_Output[L] = (self.Flattened_Input[L] - y)
 
         for k in range(L, 0, -1):
 
@@ -109,58 +112,75 @@ class NeuralNet:
             self.dFlattened_Input[k - 1] = np.matmul(self.dLayer_Output[k], self.Weights[k].T)
             self.dLayer_Output[k - 1] = np.multiply(self.dFlattened_Input[k - 1], activfunc(self.Flattened_Input[k - 1],'Softmax', deri=True))
 
-    def fit(self, X, Y, epochs=100, initialize='True', learning_rate=0.001, display_loss=True):
+    def fit(self, X, Y, epochs=100, initialize='True', learning_rate=0.001, display_loss=False):
 
         """
-        Function for fitting the train data to the neural network( Making the neural network learn)
-        :param: X: training data of the input variable
-        :param: Y: training data of the output variable
-        :param: epochs: Number of iteration to be performed till the model converges
-        :param: learning_rate: This value tells us how fast the model learns about the data,
+        Function for training neural network using the data given.
+
+        :param: X: data feature matrix
+        :param: Y: list of the lables for the feature matrix
+        :param: epochs: Number of iteration to be performed by the network
+        :param: learning_rate: The step value, it decides how much to move at every iteration
         :param: display_loss: It displays the loss in the model
 
         """
         self.number_of_Inputs = X.shape[0]
+
         if initialize:
+
             for i in range(self.Number_Hidden_Layers + 1):
-                self.Weights[i + 1] = np.random.randn(self.sizes[i],
-                                                      self.sizes[i + 1])  # Model initialisation with random weights
-                self.Bias[i + 1] = np.zeros(
-                    (1, self.sizes[i + 1]))  # Model initialization with bias vector containing 0
+
+                self.Weights[i + 1] = np.random.randn(self.sizes[i], self.sizes[i + 1])
+                self.Bias[i + 1] = np.zeros((1, self.sizes[i + 1]))
 
         for epoch in tqdm(range(epochs), total=epochs, unit="epoch"):
 
             dWeights = []
             dBias = []
+
             for i in range(self.Number_Hidden_Layers + 1):
+
                 dWeights[i + 1] = np.zeros((self.sizes[i], self.sizes[i + 1]))
                 dBias[i + 1] = np.zeros((1, self.sizes[i + 1]))
+
             for x, y in zip(X, Y):
+
                 self.backpropagation(x, y)
+
                 for i in range(self.Number_Hidden_Layers + 1):
+
                     dWeights[i + 1] += self.dWeights[i + 1]
                     dBias[i + 1] += self.dBias[i + 1]
 
             m = X.shape[1]
+
             for i in range(self.Number_Hidden_Layers + 1):
+
                 self.Weights[i + 1] -= learning_rate * (dWeights[i + 1] / m)
                 self.Bias[i + 1] -= learning_rate * (dBias[i + 1] / m)
 
             if display_loss:
-                """ Loss value is displayed which is cross entropy value"""
+                """ 
+                Loss value is displayed which is cross entropy value
+                """
                 loss = []
                 Y_pred = self.predict(X)
                 loss[epoch] = cross_entropy(Y, Y_pred)
                 print(loss[epoch])
 
     def predict(self, X):
-        """ Function of the neural network used for predicting the test cases or validation cases
+        """
+        Function of the neural network used for predicting the test cases or validation cases
         :param: X: Input Column or variable( Input test data)
-        :variable Y_pred: Predicted output when predict function is used on the test data"""
+        :return: returns the labels for the given feature matrix
+        """
         Y_pred = []
+
         for x in X:
-            y_pred = self.neural_architecture(
-                x)  # Sending the test data into the neural network and storing the output obtained in the Y_pred
+
+            y_pred = self.neural_architecture(x)
             Y_pred.append(y_pred)
+
         return np.array(Y_pred).squeeze()
+
     # ************ Using this Neural Network *********
