@@ -1,19 +1,25 @@
 import numpy as np
-from models.utilities import split, performance_matrices
-from models.decision_tree import DecisionTree
+from models.utilities.split import train_test_split
+from models.knn import KNN
+from models.utilities.performance_matrices import accuracy
 
+X = np.array([[2,3], [-1,-8], [9,7], [8,4],[-9,-6], [-6,-11]])
+y = np.array(['Positive', 'Negative', 'Positive', 'Positive', 'Negative', 'Negative'])
 
-X = np.array([[1,2,3], [5,2,3], [1,2,5], [1,6,3], [1,5,3], [5,2,6], [5,6,3]])
-y = np.array([1,1,1,0,0,0,1])
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
-X_train, X_test, y_train, y_test = split.train_test_split(X, y, test_size=0.2)
-print(X_train)
-print("*******************\n",y_train)
+print(X_train.shape)
+print(X_train[0])
 
-clf = DecisionTree(max_depth=5)
+print(y_train.shape)
+print(y_train)
+
+k = 5
+clf = KNN(k=k)
 clf.fit(X_train, y_train)
-
-y_pred = clf.predict(X_test)
-acc = performance_matrices.accuracy(y_test, y_pred)
-
+predictions = clf.predict(X_test)
+print(X_test)
+print(predictions)
+print("custom KNN classification accuracy", accuracy(y_test, predictions))
+acc = accuracy(y_test, predictions)
 print("Accuracy:", acc)

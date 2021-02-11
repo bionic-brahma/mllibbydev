@@ -8,5 +8,8 @@ def accuracy(y_true, y_pred):
     :param y_pred: The list of predicted labels
     :return: accuracy
     """
-    accuracy = np.sum(y_true == y_pred) / len(y_true)
-    return accuracy
+    if len(y_true) != 0:
+        accuracy = np.sum(y_true == y_pred) / len(y_true)
+        return accuracy
+    else:
+        return 0.0
