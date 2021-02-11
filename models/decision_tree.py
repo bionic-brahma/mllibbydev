@@ -72,8 +72,8 @@ class DecisionTree:
     def fit(self, X, y):
         """
         Fits the tree as per the training data.
-        :param X: Feature matrix of the data.
-        :param y: Data labels for the corresponding feature matrix
+        :param X: Feature matrix of the data. format--> [[1st rec], [2nd record],...]
+        :param y: Data labels for the corresponding feature matrix. format [1st label, 2nd label,...]
         :return: None
         """
         self.n_feats = X.shape[1] if not self.n_feats else min(self.n_feats, X.shape[1])
