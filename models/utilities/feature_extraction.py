@@ -99,7 +99,7 @@ def PCA(mat, ip=90, pca_vectors=0, print_msg=False):
     flag = 1
     while flag:
         eigen_temp_sum = eigen_temp_sum + eigenvalues_sorted[i]
-        ip_calc = eigen_temp_sum / sum_eigenvalues * 100
+        ip_calc = eigen_temp_sum / (sum_eigenvalues * 100)
         if print_msg:
             print("Adding Component No.", i + 1)
         if i != 0:
