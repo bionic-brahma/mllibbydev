@@ -32,14 +32,19 @@ def covNcorr(mat):
 
     # Making data as mean centralised
     for i in range(c):
-        mat.iloc[:, i] = (mat.iloc[:, i] - np.mean(mat.iloc[:, i]))
+        try:
+            mat.iloc[:, i] = (mat.iloc[:, i] - np.mean(mat.iloc[:, i]))
+        except:
+            mat[:, i] = (mat[:, i] - np.mean(mat[:, i]))
 
     # Finding the Std. Deviation of each column in vectorized operation
     for i in range(c):
         # This operation is only valid if the matrix is mean centralised.
         # Its valid in this case as the mean centralisation has been done in previous step.
-        colstd[i] = 1 / (r - 1) * np.sqrt(np.dot(np.transpose(mat.iloc[:, i]), mat.iloc[:, i]))
-
+        try:
+            colstd[i] = 1 / (r - 1) * np.sqrt(np.dot(np.transpose(mat.iloc[:, i]), mat.iloc[:, i]))
+        except:
+            colstd[i] = 1 / (r - 1) * np.sqrt(np.dot(np.transpose(mat[:, i]), mat[:, i]))
     # Containers/Variables to hold covariance and correlation of mat
     covmat = np.zeros([c, c]).astype(np.float)
     corrmat = np.zeros([c, c]).astype(np.float)
@@ -49,11 +54,15 @@ def covNcorr(mat):
 
         for j in range(c):
             # Covariance
-            covmat[i][j] = 1 / (r - 1) * np.dot(np.transpose(mat.iloc[:, i]), mat.iloc[:, j])
-
+            try:
+                covmat[i][j] = 1 / (r - 1) * np.dot(np.transpose(mat.iloc[:, i]), mat.iloc[:, j])
+            except:
+                covmat[i][j] = 1 / (r - 1) * np.dot(np.transpose(mat[:, i]), mat[:, j])
             # Correlation
-            corrmat[i][j] = 1 / (r - 1) * np.dot(np.transpose(mat.iloc[:, i]), mat.iloc[:, j]) / (colstd[i] * colstd[j])
-
+            try:
+                corrmat[i][j] = 1 / (r - 1) * np.dot(np.transpose(mat.iloc[:, i]), mat.iloc[:, j]) / (colstd[i] * colstd[j])
+            except:
+                corrmat[i][j] = 1 / (r - 1) * np.dot(np.transpose(mat[:, i]), mat[:, j]) / (colstd[i] * colstd[j] +1)
     return covmat, corrmat
 
 
