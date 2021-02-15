@@ -60,7 +60,7 @@ def train_test_split_df(df, test_size=0.2, output_seperated='yes', label_name='l
 
 
 # K folds splitting
-def cross_validation_split(df, folds=5):
+def cross_validation_split_df(df, folds=5):
     """
     *******************   PARAMETER  ************
 
@@ -73,7 +73,7 @@ def cross_validation_split(df, folds=5):
     test_data_batches : list of lists of data for testing
 
     ************************ EXAMPLE *******************
-    train_array,test_array = cross_validation_split([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],5)
+    train_array,test_array = cross_validation_split_df([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],5)
 
     train_array = [ [1, 3, 4, 5, 6, 7, 8, 9, 11, 12, 14, 16, 17, 18, 19, 20],
                     [1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19],
@@ -148,3 +148,30 @@ def train_test_split(X, y, test_size=0.3, shuffle=True):
     train_y, test_y = y[:number_of_train_records], y[number_of_train_records:]
 
     return train_X, test_X, train_y, test_y
+
+
+def cross_validation_split(X, y, k_value=2, shuffle=True):
+    """
+    The method is to split the give feature matrix and the labels into k sets.
+    :param shuffle: If true the dataset indices will be shuffled before the splitting
+    :param X: Feature matrix
+    :param y: Labels for the feature matrix
+    :param k_value: number of split you want
+    :return: k disjoint subsets in two lists foldX and foldy
+    """
+    if shuffle:
+        X, y = shuffle_data(X, y, random.randint(1, 1000))
+    test_size = 1 / k_value
+
+    foldX = []
+    foldy = []
+    number_of_records_in_one_fold = int(len(y) // (1 / test_size))
+    number_of_records_in_last_fold = len(y) % (1 / test_size)
+
+    for k in range(k_value - 1):
+        foldX.append(X[k * number_of_records_in_one_fold:(k + 1) * number_of_records_in_one_fold])
+        foldy.append(y[k * number_of_records_in_one_fold:(k + 1) * number_of_records_in_one_fold])
+    foldX.append(X[k_value * number_of_records_in_one_fold:])
+    foldy.append(y[k_value * number_of_records_in_one_fold:])
+
+    return foldX, foldy
