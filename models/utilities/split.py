@@ -150,7 +150,7 @@ def train_test_split(X, y, test_size=0.3, shuffle=True):
     return train_X, test_X, train_y, test_y
 
 
-def cross_validation_split(X, y, k_value=2, shuffle=True):
+def k_fold_split(X, y, k_value=2, shuffle=True):
     """
     The method is to split the give feature matrix and the labels into k sets.
     :param shuffle: If true the dataset indices will be shuffled before the splitting
@@ -175,3 +175,38 @@ def cross_validation_split(X, y, k_value=2, shuffle=True):
     foldy.append(y[k_value * number_of_records_in_one_fold:])
 
     return foldX, foldy
+
+
+def k_cross_validation_split(X, y, test_size=None, k_value=2, shuffle=True):
+    """
+    The method is to split the give feature matrix and the labels into k sets to train and test.
+    on different different sets.
+    :param shuffle: If true the dataset indices will be shuffled before the splitting
+    :param X: Feature matrix
+    :param y: Labels for the feature matrix
+    :param test_size: The size for the test data
+    :param k_value: number of split you want
+    :return: k pairs of train and test datasets in the form of list.
+    """
+    if test_size is None:
+        test_size = 1 / k_value
+    if shuffle:
+        X, y = shuffle_data(X, y, random.randint(1, 1000))
+    train = []
+    test = []
+    number_of_train_records = len(y) - int(len(y) // (1 / test_size))
+    for i in range(k_value):
+        train_X, test_X = [X[:len(y) - i * number_of_train_records]] + [X[len(y) - (i + 1) * number_of_train_records:]], X[
+                                                                                                                     len(
+                                                                                                                         y) - i * number_of_train_records:len(
+                                                                                                                         y) - (
+                                                                                                                                                                      i + 1) * number_of_train_records]
+        train_y, test_y = [y[:len(y) - i * number_of_train_records]] + [y[len(y) - (i + 1) * number_of_train_records:]], y[
+                                                                                                                     len(
+                                                                                                                         y) - i * number_of_train_records:len(
+                                                                                                                         y) - (
+                                                                                                                                                                      i + 1) * number_of_train_records]
+        train.append((train_X, train_y))
+        test.append((test_X, test_y))
+    k_cross_data = (train, test)
+    return k_cross_data
