@@ -188,25 +188,36 @@ def k_cross_validation_split(X, y, test_size=None, k_value=2, shuffle=True):
     :param k_value: number of split you want
     :return: k pairs of train and test datasets in the form of list.
     """
+    if k_value == len(y):
+        print("[X] K value can not be same or greater than the number of records")
+        return None
+    k_value+=1
     if test_size is None:
         test_size = 1 / k_value
     if shuffle:
         X, y = shuffle_data(X, y, random.randint(1, 1000))
     train = []
     test = []
-    number_of_train_records = len(y) - int(len(y) // (1 / test_size))
-    for i in range(k_value):
-        train_X, test_X = [X[:len(y) - i * number_of_train_records]] + [X[len(y) - (i + 1) * number_of_train_records:]], X[
-                                                                                                                     len(
-                                                                                                                         y) - i * number_of_train_records:len(
-                                                                                                                         y) - (
-                                                                                                                                                                      i + 1) * number_of_train_records]
-        train_y, test_y = [y[:len(y) - i * number_of_train_records]] + [y[len(y) - (i + 1) * number_of_train_records:]], y[
-                                                                                                                     len(
-                                                                                                                         y) - i * number_of_train_records:len(
-                                                                                                                         y) - (
-                                                                                                                                                                      i + 1) * number_of_train_records]
+    number_of_test_records = int(len(y) * test_size)
+
+    for i in range(k_value-1):
+        test_X = X[i*number_of_test_records: (i+1)*number_of_test_records].tolist()
+        test_y = y[i*number_of_test_records: (i+1)*number_of_test_records].tolist()
+
+        Ax= [x.tolist() for x in X[0:i*number_of_test_records]]
+        Bx= [x.tolist() for x in X[(i+1)*number_of_test_records:]]
+        Ax.extend(Bx)
+        train_X = Ax
+
+
+
+        Ay = [x.tolist() for x in y[0:i * number_of_test_records]]
+        By = [x.tolist() for x in y[(i + 1) * number_of_test_records:]]
+        Ay.extend(By)
+        train_y = Ay
+
         train.append((train_X, train_y))
         test.append((test_X, test_y))
+
     k_cross_data = (train, test)
     return k_cross_data
