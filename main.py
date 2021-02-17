@@ -1,5 +1,5 @@
 from models.utilities.split import k_cross_validation_split
-from models.utilities.performance_matrices import accuracy
+from models.utilities.performance_matrices import accuracy, k_fold_validation_accuracy
 import numpy as np
 from models import LinearRegression
 
@@ -19,7 +19,7 @@ for i in range(k):
     print(res[0][i], "------>>", res[1][i])
     model.fit(res[0][i][0],res[0][i][1])
     print("predicted values:-----> ", model.predict(res[1][i][0]))
-    print("\nAccuracy: ", accuracy(res[1][i][1],model.predict(res[1][i][0])))
+    print("\nAccuracy: ", accuracy(res[1][i][1],model.predict(res[1][i][0]),matric="R-squared"))
 
 
 
