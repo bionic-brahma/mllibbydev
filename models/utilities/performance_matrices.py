@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def accuracy(y_true, y_pred , matric=None, independent_regressors=None ):
+def accuracy(y_true, y_pred, matric=None, independent_regressors=None):
     """
     Calculates the accuracy
     :param y_true: The list of actual labels
@@ -11,30 +11,32 @@ def accuracy(y_true, y_pred , matric=None, independent_regressors=None ):
     :return: accuracy
     """
     accuracy = 0.0
+    pseudo_bias = 0.00001
 
     if len(y_true) != 0:
 
         if matric == "MAE":
 
-            accuracy = (1/len(y_true))*np.sum(np.abs(y_true - y_pred))
+            accuracy = 1 - (1 / len(y_true)) * np.sum(np.abs(y_true - y_pred))
 
         elif matric == "R-squared":
 
-            accuracy = 1 - np.sum((y_true - y_pred)**2)/np.sum((y_true - np.mean(y_true))**2)
+            accuracy = 1 - np.sum((y_true - y_pred) ** 2) / np.sum((y_true - np.mean(y_true)) ** 2)
 
         elif matric == "R-squared_adjusted":
 
-            accuracy = 1-(1 - np.sum((y_true - y_pred)**2)/np.sum((y_true - np.mean(y_true))**2))*(len(y_true)-1)/(len(y_true)-1-independent_regressors)
+            accuracy = 1 - (1 - np.sum((y_true - y_pred) ** 2) / np.sum((y_true - np.mean(y_true)) ** 2)) * (
+                        len(y_true) - 1) / (len(y_true) - 1 - independent_regressors)
 
-        elif accuracy == "MSE":
+        elif matric == "MSE":
 
-            accuracy = (1/len(y_true))*np.sum((y_true - y_pred)**2)
+            accuracy = 1 - (1 / len(y_true)) * np.sum((y_true - y_pred) ** 2)
 
         else:
 
             accuracy = np.sum(y_true == y_pred) / len(y_true)
 
-        return accuracy
+        return accuracy*100
 
     else:
         return 0.0
@@ -63,7 +65,8 @@ def confusion_matrix(actual, predicted):
     return unique, matrix
 
 
-def k_fold_validation_accuracy(list_actual_y, list_predicted, matric=None, independent_regressors=None, return_tolerance=False):
+def k_fold_validation_accuracy(list_actual_y, list_predicted, matric=None, independent_regressors=None,
+                               return_tolerance=False):
     """
     The method to return the k fold validation accuracy with tolerance if return_tolerance is
     kept true.
