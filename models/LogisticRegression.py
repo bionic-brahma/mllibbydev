@@ -56,7 +56,7 @@ class LogisticRegression:
 
         Y = np.where(Y == self.label_dict[0], 0, 1)
 
-        n_rec, n_feat = X.shape
+        n_rec, n_feat = np.array(X).shape
         # print("records= ", n_rec, "  features= ", n_feat)
         self.weights = np.zeros(n_feat)
         self.bias = 0.0
@@ -75,12 +75,12 @@ class LogisticRegression:
 
                 if Y[idx] <= 0:
 
-                    self.weights = self.weights - self.lr * model[idx] * x
+                    self.weights = self.weights - self.lr * model[idx] * np.array(x)
                     self.bias = self.bias - self.lr * model[idx]
 
                 else:
 
-                    self.weights = self.weights - self.lr * (model[idx] - 1) * x
+                    self.weights = self.weights - self.lr * (model[idx] - 1) * np.array(x)
                     self.bias = self.bias - self.lr * (model[idx] - 1)
 
             if self.show_steps:

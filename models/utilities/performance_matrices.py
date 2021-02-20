@@ -56,12 +56,19 @@ def confusion_matrix(actual, predicted):
     """
     unique = set(actual)
     matrix = [list() for x in range(len(unique))]
+
     for i in range(len(unique)):
+
         matrix[i] = [0 for x in range(len(unique))]
+
     lookup = dict()
+
     for i, value in enumerate(unique):
+
         lookup[value] = i
+
     for i in range(len(actual)):
+
         x = lookup[actual[i]]
         y = lookup[predicted[i]]
         matrix[y][x] += 1

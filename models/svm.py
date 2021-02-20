@@ -23,6 +23,7 @@ class SVM:
         self.n_iters = n_iters
         self.w = None
         self.b = None
+        self.label_dic = None
 
     def fit(self, X, y):
         """
@@ -31,9 +32,14 @@ class SVM:
         :param y: Data labels for the corresponding feature matrix. format [1st label, 2nd label,...]
         :return: None
         """
-        n_samples, n_features = X.shape
+        n_samples, n_features = np.array(X).shape
+        y_ = y
 
-        y_ = np.where(y <= 0, -1, 1)
+        for i in range(len(y)):
+            if y[i] <= 0:
+                y_[i] = -1
+            else:
+                y_[i] = 1
 
         self.w = np.zeros(n_features)
         self.b = 0

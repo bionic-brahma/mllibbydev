@@ -76,9 +76,8 @@ class DecisionTree:
         :param y: Data labels for the corresponding feature matrix. format [1st label, 2nd label,...]
         :return: None
         """
-        self.n_feats = X.shape[1] if not self.n_feats else min(self.n_feats, X.shape[1])
+        self.n_feats = np.array(X).shape[1] if not self.n_feats else min(self.n_feats, X.shape[1])
         self.root = self.span_tree(X, y)
-        print(self.root)
 
     def predict(self, X):
         """
@@ -96,7 +95,7 @@ class DecisionTree:
         :param depth: The depth of the tree at beginning.
         :return: The root node
         """
-        n_samples, n_features = X.shape
+        n_samples, n_features = np.array(X).shape
         n_labels = len(np.unique(y))
 
         # stopping criteria
@@ -109,12 +108,12 @@ class DecisionTree:
         feat_idxs = np.random.choice(n_features, self.n_feats, replace=False)
 
         # selecting  best split according to information gain
-        best_feat, best_thresh = self._best_criteria(X, y, feat_idxs)
+        best_feat, best_thresh = self._best_criteria(np.array(X), y, feat_idxs)
 
         # span the children that result from the split
-        left_idxs, right_idxs = self.split(X[:, best_feat], best_thresh)
-        left = self.span_tree(X[left_idxs, :], y[left_idxs], depth + 1)
-        right = self.span_tree(X[right_idxs, :], y[right_idxs], depth + 1)
+        left_idxs, right_idxs = self.split(np.array(X)[:, best_feat], best_thresh)
+        left = self.span_tree(np.array(X)[left_idxs, :], np.array(y)[left_idxs], depth + 1)
+        right = self.span_tree(np.array(X)[right_idxs, :], np.array(y)[right_idxs], depth + 1)
         return Node(best_feat, best_thresh, left, right)
 
     def _best_criteria(self, X, y, feat_idxs):
@@ -160,7 +159,8 @@ class DecisionTree:
         # compute the weighted avg. of the loss for the children
         n = len(y)
         n_l, n_r = len(left_idxs), len(right_idxs)
-        e_l, e_r = entropy(y[left_idxs]), entropy(y[right_idxs])
+        #print(entropy(y[left_idxs]))
+        e_l, e_r = entropy(np.array(y)[left_idxs]), entropy(np.array(y)[right_idxs])
         child_entropy = (n_l / n) * e_l + (n_r / n) * e_r
 
         # information gain is difference in loss before vs. after split
@@ -202,6 +202,8 @@ class DecisionTree:
         most_common = counter.most_common(1)[0][0]
         return most_common
 
+
+'''
     def Save_Model(self, file_name):
         """
         Saves the model in JSON format
@@ -233,5 +235,5 @@ class DecisionTree:
         with open(file_name, "r") as model_file:
             data = json.load(model_file)
             self.parameters = ast.literal_eval(data["model_param"])
-            return data
+            return data '''
 

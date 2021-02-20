@@ -16,7 +16,6 @@ def Load_Model(file_name, path=''):
     model_file_full_name = path + '/' + file_name
     with open(model_file_full_name, "r") as model_file:
         data = json.load(model_file)
-        # print(data)
         return data
 
 
@@ -44,8 +43,6 @@ def Save_Model(model_name, training_data_file_name, no_features, no_row, split_r
         "split_ratio": split_ratio,
         "trained_model_value": trained_model_value,
     }
-    # print(model_data)
-    # path="Saved_models/"
 
     model_file_name = model_name + str(".json")
     model_file_full_name = path + '/' + model_file_name
@@ -53,11 +50,11 @@ def Save_Model(model_name, training_data_file_name, no_features, no_row, split_r
     try:
         with open(model_file_full_name, 'x') as modelfile:
             json.dump(model_data, modelfile, indent=4)
-            print('''model_saved sucessfully in file named "{}" at location "{}"'''.format(model_file_name, path))
+            print('''model_saved successfully in file named "{}" at location "{}"'''.format(model_file_name, path))
     except:
         with open(model_file_full_name, 'w') as modelfile:
             json.dump(model_data, modelfile, indent=4)
-            print('''model_saved sucessfully in file named "{}" at location "{}"'''.format(model_file_name, path))
+            print('''model_saved successfully in file named "{}" at location "{}"'''.format(model_file_name, path))
 
     return
 

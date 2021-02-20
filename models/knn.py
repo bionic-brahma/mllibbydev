@@ -17,7 +17,7 @@ def euclidean_distance(x1, x2):
     :param x2: Second point in n-coordinates
     :return: Distance between the points in euclidean reference
     """
-    return np.sqrt(np.sum((x1 - x2) ** 2))
+    return np.sqrt(np.sum((np.array(x1) - np.array(x2)) ** 2))
 
 
 class KNN:

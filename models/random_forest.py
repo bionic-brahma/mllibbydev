@@ -17,10 +17,10 @@ def bootstrap_sample(X, y):
     :param y:  list of labels for that data feature matrix
     :return:  bootstrapped sample
     """
-    n_samples = X.shape[0]
+    n_samples = np.array(X).shape[0]
     idxs = np.random.choice(n_samples, n_samples, replace=True)
 
-    return X[idxs], y[idxs]
+    return np.array(X)[idxs], np.array(y)[idxs]
 
 
 def most_common_label(y):

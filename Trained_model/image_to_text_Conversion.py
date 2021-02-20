@@ -1,4 +1,3 @@
-
 from tqdm import tqdm
 import imutils as imutils
 import numpy as np
@@ -31,6 +30,7 @@ else:
 def nothing(x):
     pass
 
+
 # not used for now.. only used in debuging
 def initializeTrackbars(max=100, min=0, initial_value=50, name="trackbar", windoname="contorl"):
     cv2.namedWindow(windoname)
@@ -53,7 +53,7 @@ while 1:
     #
 
     if resize_flag:
-        images = cv2.resize(images, (int(images.shape[0]/resize_factor), int(images.shape[0]/resize_factor)))
+        images = cv2.resize(images, (int(images.shape[0] / resize_factor), int(images.shape[0] / resize_factor)))
 
     # convert to grayscale image
     gray = cv2.cvtColor(images, cv2.COLOR_BGR2GRAY)
@@ -65,7 +65,6 @@ while 1:
 
     # performing some median blur
     cv2.medianBlur(binary_img, 3)
-
 
     #
     # Pre- processing is done on the image
@@ -116,8 +115,6 @@ while 1:
             if len(text) > len(final_text):
                 final_text = text
                 final_angle = angle
-
-
 
     # closing the temporary windo which was showing the rotaion
     if show_progress:

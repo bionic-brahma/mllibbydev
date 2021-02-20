@@ -25,7 +25,7 @@ class NaiveBayes:
         :param y: List of labels
         :return: None
         """
-        n_samples, n_features = X.shape
+        n_samples, n_features = np.array(X).shape
         self._classes = np.unique(y)
         n_classes = len(self._classes)
 
