@@ -23,7 +23,7 @@ class SVM:
         self.n_iters = n_iters
         self.w = None
         self.b = None
-        self.label_dic = None
+        self.label_dict = dict()
 
     def fit(self, X, y):
         """
@@ -33,7 +33,25 @@ class SVM:
         :return: None
         """
         n_samples, n_features = np.array(X).shape
+
+        unique = np.unique(y)
+
+        if len(unique) > 2:
+            print(
+                "The number of lebels in the target variable is more than 2. please switch to LogisticMultiClassifier.")
+            return "[X]. Data is not for binary classifier."
+
+        for i in range(len(unique)):
+            self.label_dict[i] = unique[i]
+
+        #print(self.label_dict)
         y_ = y
+
+        for i in range(len(y)):
+            if y[i] == unique[0]:
+                y[i] = 0
+            else:
+                y[i] = 1
 
         for i in range(len(y)):
             if y[i] <= 0:
@@ -60,14 +78,31 @@ class SVM:
         :return: Label for the feature vector
         """
         approx = np.dot(X, self.w) - self.b
-        return np.sign(approx)
+        out = np.array(np.sign(approx))
 
+        labels = list()
+
+        if out.size == 1:
+            if out == -1:
+                labels.append(self.label_dict[0])
+            else:
+                labels.append(self.label_dict[1])
+        else:
+            for i in range(out.size):
+                if out[i] == -1:
+                    labels.append(self.label_dict[0])
+                else:
+                    labels.append(self.label_dict[1])
+        return labels
+
+
+'''
     def Save_Model(self, file_name):
         """
         This function saves the trained model in .json format.
         :param file_name: File name (Without extension) along with the location address to save the model.
         :return:
-        """
+        
 
         model_data = {"model_param": str([self.w.tolist(), self.b])}
         model_file = file_name + str(".json")
@@ -103,3 +138,4 @@ class SVM:
 
             print("model loading failed")
             return False
+            '''''

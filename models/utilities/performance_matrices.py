@@ -37,13 +37,16 @@ def accuracy(y_true, y_pred, matric=None, independent_regressors=None):
             accuracy = 1 - (1 / len(y_true)) * np.sum((y_true - y_pred) ** 2)
 
         else:
-
-            accuracy = np.sum(y_true == y_pred) / len(y_true)
+            sum_correct = 0
+            for i in range(len(y_true)):
+                if y_true[i] == y_pred[i]:
+                    sum_correct +=1
+            accuracy = sum_correct / len(y_true)
 
         return accuracy*100
 
     else:
-        return 0.0
+        return accuracy
 
 
 def confusion_matrix(actual, predicted):

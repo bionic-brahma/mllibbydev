@@ -9,7 +9,7 @@ b = np.array([5, 5, 5, 10, 10, 5, 5, 10])
 tr_x, tx, tr_y, ty = train_test_split(a, b)
 model.fit(tr_x, tr_y)
 print("test accuracy: ", accuracy(ty, model.predict(tx)))
-print("predicted value for [10,1]:", model.predict([10, 1]))
+print("predicted value for [10,100]:", model.predict([10, 100]))
 k = 3
 res = k_cross_validation_split(a, b, k_value=k)
 
