@@ -39,6 +39,8 @@ def accuracy(y_true, y_pred, matric=None, independent_regressors=None):
         else:
             sum_correct = 0
             for i in range(len(y_true)):
+                #print(y_true)
+                #print(y_pred)
                 if y_true[i] == y_pred[i]:
                     sum_correct +=1
             accuracy = sum_correct / len(y_true)
