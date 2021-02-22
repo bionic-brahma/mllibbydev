@@ -17,20 +17,20 @@ def train_test_split_df(df, test_size=0.2, output_seperated='yes', label_name='l
                 return type : panda dataframes
 
                 train_df : data used to train model   (containes X and Y)
-                test_df : data used to test_out trained model  (containes X and Y)
+                test_df : data used to test trained model  (containes X and Y)
     output_separated='yes':     return X_test, X_train, Y_test, Y_train
 
             return type :  numpy arrays
 
-            X_test : data used to test_out trained model (contains feaured only)
+            X_test : data used to test trained model (contains feaured only)
             X_train : data used to train  model (contains feaured only)
 
-            Y_test :  output labels used to test_out train model
+            Y_test :  output labels used to test train model
             Y_train : output Labels used to train model
 
     ************  EXAMPLE ****************
 
-    train, test_out = train_test_split_df(df,0.7,'no')
+    train, test = train_test_split_df(df,0.7,'no')
     xtest, xtrain,ytest,ytrain= train_test_split_df(df,0.7,'yes','label')
     """
     try:
@@ -106,7 +106,7 @@ def cross_validation_split_df(df, folds=5):
         test_df = df.loc[test_indices]
         train_df = df.drop(test_indices)
 
-        test_fold.append(test_df)  # list containing list of data for test_out
+        test_fold.append(test_df)  # list containing list of data for test
         train_fold.append(train_df)  # list containing list of data for train
 
     return test_fold, train_fold
@@ -137,7 +137,7 @@ def train_test_split(X, y, test_size=0.3, shuffle=True):
     :param shuffle: If true the dataset indices will be shuffled before the splitting
     :param X: Feature matrix
     :param y: Labels for the featur matrix
-    :param test_size: The relative size of the test_out dataset
+    :param test_size: The relative size of the test dataset
     :return: train_X, test_X, train_y,  test_y
     """
     if shuffle:
@@ -179,14 +179,14 @@ def k_fold_split(X, y, k_value=2, shuffle=True):
 
 def k_cross_validation_split(X, y, test_size=None, k_value=2, shuffle=True):
     """
-    The method is to split the give feature matrix and the labels into k sets to train and test_out.
+    The method is to split the give feature matrix and the labels into k sets to train and test.
     on different different sets.
     :param shuffle: If true the dataset indices will be shuffled before the splitting
     :param X: Feature matrix
     :param y: Labels for the feature matrix
-    :param test_size: The size for the test_out data
+    :param test_size: The size for the test data
     :param k_value: number of split you want
-    :return: k pairs of train and test_out datasets in the form of list.
+    :return: k pairs of train and test datasets in the form of list.
     """
     if k_value == len(y):
         print("[X] K value can not be same or greater than the number of records")
