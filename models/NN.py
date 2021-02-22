@@ -32,7 +32,7 @@ def cross_entropy(label, prediction):
 
 class NeuralNet:
 
-    def __init__(self, n_inputs=None, n_outputs=None, hidden_layers=None, activations_for_layers=None):
+    def __init__(self, n_inputs, n_outputs, hidden_layers=None, activations_for_layers=None):
 
         """
         This is the constrictor of the NeuralNet class.
@@ -57,22 +57,25 @@ class NeuralNet:
         self.dBias = {}
         self.dWeights = {}
         if hidden_layers is None:
-            hidden_layers = [5, 5, 3]
+            hidden_layers = [2, 2]
 
         self.number_of_Inputs = n_inputs
         self.number_of_Outputs = n_outputs
         self.Number_Hidden_Layers = len(hidden_layers)
         self.sizes = [self.number_of_Inputs] + hidden_layers + [self.number_of_Outputs]
-        self.Weights = {}
-        self.Bias = {}
-
+        self.Weights = list()
+        self.Bias = list()
+        print(self.Number_Hidden_Layers)
+        #self.Weights = np.zeros((self.Number_Hidden_Layers+2, self.Number_Hidden_Layers+2, self.Number_Hidden_Layers+2))
+        self.Weights.append(0)
+        self.Bias.append(0)
         for i in range(self.Number_Hidden_Layers + 1):
 
             # random weights initialization
-            self.Weights[i + 1] = np.random.randn(self.sizes[i], self.sizes[i + 1])
+            self.Weights.append(np.random.randn(self.sizes[i], self.sizes[i + 1]))
 
             # bias initialization to 0
-            self.Bias[i + 1] = np.zeros((1, self.sizes[i + 1]))
+            self.Bias.append(np.zeros((1, self.sizes[i + 1])))
 
     def neural_architecture(self, x):
         """
@@ -84,8 +87,11 @@ class NeuralNet:
         self.Flattened_Input[0] = x.reshape(1, -1)
 
         for i in range(self.Number_Hidden_Layers):
-
-            self.Layer_Output[i + 1] = np.matmul(self.Flattened_Input[i], self.Weights[i + 1]) + self.Bias[i + 1]
+            print("\nfalttened_input[i]:", self.Flattened_Input[i])
+            print("weigghyt_input[i+1]:", self.Flattened_Input[i])
+            #print("falttened_input[i+1]:", self.Flattened_Input[i+1])
+            print(self.Layer_Output)
+            self.Layer_Output[i + 1] = np.matmul(self.Flattened_Input[i], np.transpose(self.Weights[i + 1])) + self.Bias[i + 1]
 
             self.Flattened_Input[i + 1] = activfunc(self.Layer_Output[i + 1], 'LeakyReLU')
 
