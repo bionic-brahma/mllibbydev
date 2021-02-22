@@ -5,7 +5,7 @@
 
 #######################################################################################
 # Please disable the next block while amending this file so that proper
-# test can happen.
+# test_out can happen.
 #######################################################################################
 
 # The block suppresses the warning on runtime

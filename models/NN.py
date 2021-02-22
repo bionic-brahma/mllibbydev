@@ -1,3 +1,13 @@
+####
+###
+###         DO NOT USE THIS FUNCTION AS ITS NOT COMPLETED.
+####        I WILL BE MAKING WHOLE DEEP LEARNING LIBRARY THAT WILL BE
+######      USTILISING SOME COMMON THINGS FROM NEURAL NETS.
+#######                         [WAIT FOR NEXT 3 DAYS]
+#########
+
+
+
 import numpy as np
 from tqdm import tqdm
 

@@ -84,7 +84,7 @@ class KNN:
         distances.sort()
         return distances
 
-    # functions  to get distances with all the data points from the test data point
+    # functions  to get distances with all the data points from the test_out data point
     def getNeighbours(self, testdata, x, n_sample):
         similarity = []
         for i in range(0, n_sample):
