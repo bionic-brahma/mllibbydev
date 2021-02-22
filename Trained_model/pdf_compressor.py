@@ -1,8 +1,6 @@
 import subprocess
 import os.path
 import sys
-import argparse
-
 
 class CompressPDF:
     def __init__(self, compress_level=0, show_info=False):
@@ -77,16 +75,10 @@ if __name__ == '__main__':
 
     start_folder = "test/"
     compress = 2
-    p = CompressPDF(compress)
+    p = CompressPDF(compress, show_info=True)
 
     compress_folder = os.path.join(start_folder, "test_out/")
 
-    if not os.path.exists(compress_folder):
-
-        pass
-        # os.makedirs(compress_folder)
-
-    '''Loop within folder over PDF files'''
     for filename in os.listdir(start_folder):
 
         my_name, file_extension = os.path.splitext(filename)
@@ -99,8 +91,8 @@ if __name__ == '__main__':
 
             if p.compress(file, new_file):
 
-                print("{} done!".format(filename))
+                print("{} Compression done.".format(filename))
 
             else:
 
-                print("{} gave an error!".format(file))
+                print("Format Error")
