@@ -1,247 +1,139 @@
-##########################################################
-#  The neural network by Devendra in collaboration
-#  for Risk Latte Americas Inc.
-##########################################################
-
-#
-#    Please do consider testing with many datasets and
-#            provide feedback
-#
-
-import sys
-from tqdm import tqdm
 import numpy as np
-from models.utilities.Activations import activfunc
-
-'''
-def cross_entropy(label, prediction):
-    """
-    Cross Entropy loss function
-    :param label: list of actual labels
-    :param prediction: list of predicted labels
-    :return: cross entropy
-    """
-
-   
-
-    product = np.multiply(prediction, label)
-    temp = product[product != 0]
-    entropy = -np.log(temp)
-    _cross_entropy = np.mean(entropy)
-
-    return _cross_entropy
-'''
+from tqdm import tqdm
 
 
-def cross_entropy(p, q):
-    return -sum([p[i] * np.log(q[i]) for i in range(len(p))])
-
-
-class NeuralNet:
-
-    def __init__(self, n_inputs, n_outputs, hidden_layers=None, activations_for_layers=None):
-
-        """
-        This is the constrictor of the NeuralNet class.
-        all the parameters are optional.
-
-        :param: n_inputs: The total number of features in one record in the dataset
-        :param: n_outputs: The total number of classes or labels
-        :param: hidden_layers: list where length of list gives the number of hidden layers and ith entry in the list
-                indicates the number of neurons present in the ith hidden layer.
-        :param: activations_for_layers: The list containing the activation functions for hidden layers
-                Ex: ['ReLu', 'Softmax', 'Sigmoid', 'SoftPlus', 'Swish', 'Linear']  this is for a six hidden layer
-                network. Its just an example without relevance of applicability.
-                If nothing is provided. The 'LeakyReLU' will be used by default.
-        :variable: W: Weights assigned to the layers
-        :variable: B: Bias assigned to the layers"""
-
-        self.loss = {}
-        self.Flattened_Input = {}
-        self.Layer_Output = {}
-        self.dLayer_Output = {}
-        self.dFlattened_Input = {}
-        self.dBias = {}
-        self.dWeights = {}
-        self.label_dict = dict()
-        if hidden_layers is None:
-            hidden_layers = [2, 2]
-        self.actual_prob = list()
-        self.number_of_Inputs = n_inputs
-        self.number_of_Outputs = n_outputs
-        self.Number_Hidden_Layers = len(hidden_layers)
-        self.sizes = [self.number_of_Inputs] + hidden_layers + [self.number_of_Outputs]
-        self.Weights = list()
-        self.Bias = list()
-        print(self.Number_Hidden_Layers)
-        # self.Weights = np.zeros((self.Number_Hidden_Layers+2, self.Number_Hidden_Layers+2, self.Number_Hidden_Layers+2))
-        self.Weights.append(0)
-        self.Bias.append(0)
-        for i in range(self.Number_Hidden_Layers + 1):
-            # random weights initialization
-            self.Weights.append(np.random.randn(self.sizes[i], self.sizes[i + 1]))
-
-            # bias initialization to 0
-            self.Bias.append(np.zeros((1, self.sizes[i + 1])))
-
-    def neural_architecture(self, x):
-        """
-        Creates the architecture for the neural net with the parameters given in the class
-        constructor.
-        :param: x: Number of inputs flattened
-        :param: Layer_Output: It gives dot product of H(Inputs) and W(Weights) Which is added to vector B(Bias)
-        """
-        self.Flattened_Input[0] = np.array(x).reshape(1, -1)
-
-        for i in range(self.Number_Hidden_Layers):
-            # print("\nfalttened_input[i]:", self.Flattened_Input[i])
-            # print("weigghyt_input[i+1]:", self.Flattened_Input[i])
-            # print("falttened_input[i+1]:", self.Flattened_Input[i+1])
-            # print(self.Layer_Output)
-            self.Layer_Output[i + 1] = np.matmul(self.Flattened_Input[i], np.transpose(self.Weights[i + 1])) + \
-                                       self.Bias[i + 1]
-
-            self.Flattened_Input[i + 1] = activfunc(self.Layer_Output[i + 1], 'LeakyReLU')
-
-        self.Layer_Output[self.Number_Hidden_Layers + 1] = np.matmul(self.Flattened_Input[self.Number_Hidden_Layers],
-                                                                     np.transpose(
-                                                                         self.Weights[self.Number_Hidden_Layers + 1])) + \
-                                                           self.Bias[self.Number_Hidden_Layers + 1]
-
-        if self.number_of_Outputs > 1:
-
-            self.Flattened_Input[self.Number_Hidden_Layers + 1] = activfunc(
-                self.Layer_Output[self.Number_Hidden_Layers + 1], 'Softmax')
-
+def batch_iterator(X, y=None, batch_size=64):
+    n_samples = X.shape[0]
+    for i in np.arange(0, n_samples, batch_size):
+        begin, end = i, min(i + batch_size, n_samples)
+        if y is not None:
+            yield X[begin:end], y[begin:end]
         else:
+            yield X[begin:end]
 
-            self.Flattened_Input[self.Number_Hidden_Layers + 1] = activfunc(
-                self.Layer_Output[self.Number_Hidden_Layers + 1], 'Sigmoid')
 
-        return self.Flattened_Input[self.Number_Hidden_Layers + 1]
+class NeuralNetwork:
 
-    def backpropagation(self, x, y):
-        """
-        Function performing the backpropagation to update weights
+    def __init__(self, optimizer, loss, validation_data=None):
+        self.optimizer = optimizer
+        self.layers = []
+        self.errors = {"training": [], "validation": []}
+        self.loss_function = loss()
 
-        :param: x: Input data matrix (all entries should be numerical)
-        :param: y: Output data labels
+        self.val_set = None
+        if validation_data:
+            X, y = validation_data
+            self.val_set = {"X": X, "y": y}
 
-        """
-        # creating and initialising the neural net with weights and biases along with input.
-        self.neural_architecture(x)
+    def set_trainable(self, trainable):
+        for layer in self.layers:
+            layer.trainable = trainable
 
-        L = self.Number_Hidden_Layers + 1
+    def add(self, layer):
+        if self.layers:
+            layer.set_input_shape(shape=self.layers[-1].output_shape())
 
-        # It contains the differentiation of the loss calculated at the last layer
-        # print("y ===", y)
-        self.dLayer_Output[L] = (self.Flattened_Input[L] - y)
+        if hasattr(layer, 'initialize'):
+            layer.initialize(optimizer=self.optimizer)
 
-        for k in range(L, 0, -1):
+        self.layers.append(layer)
 
-            self.dWeights[k] = np.matmul(self.Flattened_Input[k - 1].T, self.dLayer_Output[k])
-            self.dBias[k] = self.dLayer_Output[k]
+    def test_on_batch(self, X, y):
+        y_pred = self._forward_pass(X, training=False)
+        loss = np.mean(self.loss_function.loss(y, y_pred))
+        acc = self.loss_function.acc(y, y_pred)
 
-            self.dFlattened_Input[k - 1] = np.matmul(self.dLayer_Output[k], self.Weights[k].T)
-            if k == L - 1:
-                self.dLayer_Output[k - 1] = np.multiply(self.dFlattened_Input[k - 1],
-                                                        activfunc(self.Flattened_Input[k - 1], 'Softmax', deri=True))
-            else:
-                self.dLayer_Output[k - 1] = np.multiply(self.dFlattened_Input[k - 1],
-                                                        activfunc(self.Flattened_Input[k - 1], 'LeakyReLU', deri=True))
+        return loss, acc
 
-    def fit(self, X, Y, epochs=100, initialize_with_random_weights='True', learning_rate=0.001, show_loss=False):
+    def train_on_batch(self, X, y):
+        y_pred = self._forward_pass(X)
+        loss = np.mean(self.loss_function.loss(y, y_pred))
+        acc = self.loss_function.acc(y, y_pred)
+        loss_grad = self.loss_function.gradient(y, y_pred)
+        self._backward_pass(loss_grad=loss_grad)
 
-        """
-        Function for training neural network using the data given.
+        return loss, acc
 
-        :param: X: data feature matrix
-        :param: Y: list of the lables for the feature matrix
-        :param: epochs: Number of iteration to be performed by the network
-        :param: learning_rate: The step value, it decides how much to move at every iteration
-        :param: show_loss: It displays the loss in the model
+    def fit(self, X, y, n_epochs, batch_size):
+        for _ in tqdm(range(n_epochs), desc="Please wait while model is fitting..."):
 
-        """
+            batch_error = []
+            for X_batch, y_batch in batch_iterator(X, y, batch_size=batch_size):
+                loss, _ = self.train_on_batch(X_batch, y_batch)
+                batch_error.append(loss)
 
-        self.number_of_Inputs = np.array(X).shape[0]
+            self.errors["training"].append(np.mean(batch_error))
 
-        unique = np.unique(Y)
-        for i in range(len(unique)):
-            self.label_dict[i] = unique[i]
+            if self.val_set is not None:
+                val_loss, _ = self.test_on_batch(self.val_set["X"], self.val_set["y"])
+                self.errors["validation"].append(val_loss)
 
-        sum = dict()
-        temp_sum = 0
-        for j in range(len(self.label_dict)):
-            for i in range((len(Y))):
-                if Y[i] == self.label_dict[j]:
-                    Y[i] = j
-                    temp_sum += 1
-            sum[j] = temp_sum
-            temp_sum = 0
+        return self.errors["training"], self.errors["validation"]
 
-        for i in sum.values():
-            self.actual_prob.append(i / len(Y))
+    def _forward_pass(self, X, training=True):
+        layer_output = X
+        for layer in self.layers:
+            layer_output = layer.forward_pass(layer_output, training)
 
-        # print(self.label_dict)
+        return layer_output
 
-        if initialize_with_random_weights:
+    def _backward_pass(self, loss_grad):
+        for layer in reversed(self.layers):
+            loss_grad = layer.backward_pass(loss_grad)
 
-            for i in range(self.Number_Hidden_Layers + 1):
-                self.Weights[i + 1] = np.random.randn(self.sizes[i], self.sizes[i + 1])
-                self.Bias[i + 1] = np.zeros((1, self.sizes[i + 1]))
-
-        for epoch in tqdm(range(epochs), file=sys.stdout, unit="epoch", desc="Training"):
-
-            dWeights = {}
-            dBias = {}
-
-            for i in range(self.Number_Hidden_Layers + 1):
-                dWeights[i + 1] = np.zeros((self.sizes[i], self.sizes[i + 1]))
-                dBias[i + 1] = np.zeros((1, self.sizes[i + 1]))
-            # print(Y)
-            for x, y in zip(X, Y):
-
-                self.backpropagation(x, y)
-
-                for i in range(self.Number_Hidden_Layers + 1):
-                    dWeights[i + 1] += self.dWeights[i + 1]
-                    dBias[i + 1] += self.dBias[i + 1]
-
-            m = np.array(X).shape[1]
-
-            for i in range(self.Number_Hidden_Layers + 1):
-                self.Weights[i + 1] -= learning_rate * (dWeights[i + 1] / m)
-                self.Bias[i + 1] -= learning_rate * (dBias[i + 1] / m)
-
-            if show_loss:
-                """ 
-                Loss value is displayed which is cross entropy value
-                """
-                Y_pred = self.predict(X)
-                self.loss[epoch] = cross_entropy(self.actual_prob, Y_pred)
-                print("Loss:", self.loss[epoch])
+    def summary(self, name="Model Summary"):
+        table_data = [["Layer Type", "Parameters", "Output Shape"]]
+        tot_params = 0
+        for layer in self.layers:
+            layer_name = layer.layer_name()
+            params = layer.parameters()
+            out_shape = layer.output_shape()
+            table_data.append([layer_name, str(params), str(out_shape)])
+            tot_params += params
 
     def predict(self, X):
-        """
-        Function of the neural network used for predicting the test cases or validation cases
-        :param: X: Input Column or variable( Input test data)
-        :return: returns the labels for the given feature matrix
-        """
-        Y_pred = []
-        confidence_pred_list = []
-        for x in X:
-            confidence = dict()
-            # print("x turns for prdeiction: ", x)
-            y_pred = self.neural_architecture(x)
-            id = 0
-            for i in np.squeeze(y_pred):
-                confidence[self.label_dict[id]] = i
-                id += 1
+        """ Use the trained model to predict labels of X """
+        return self._forward_pass(X, training=False)
 
-            most_probable_pred = self.label_dict[np.argmax(y_pred)]
-            Y_pred.append(most_probable_pred)
-            confidence_pred_list.append(confidence)
-        # print(confidence_pred_list)
-        return Y_pred
 
-    # ************ Using this Neural Network *********
+def softmax_crossentropy_with_logits(logits, reference_answers):
+    logits_for_answers = logits[np.arange(len(logits)), reference_answers]
+    xentropy = - logits_for_answers + np.log(np.sum(np.exp(logits), axis=-1))
+
+    return xentropy
+
+
+def grad_softmax_crossentropy_with_logits(logits, reference_answers):
+    ones_for_answers = np.zeros_like(logits)
+    ones_for_answers[np.arange(len(logits)), reference_answers] = 1
+
+    softmax = np.exp(logits) / np.exp(logits).sum(axis=-1, keepdims=True)
+
+    return (- ones_for_answers + softmax) / logits.shape[0]
+
+
+class Adam():
+    def __init__(self, learning_rate=0.001, b1=0.9, b2=0.999):
+        self.learning_rate = learning_rate
+        self.eps = 1e-8
+        self.m = None
+        self.v = None
+        self.b1 = b1
+        self.b2 = b2
+
+    def update(self, w, grad_wrt_w):
+        if self.m is None:
+            self.m = np.zeros(np.shape(grad_wrt_w))
+            self.v = np.zeros(np.shape(grad_wrt_w))
+
+        self.m = self.b1 * self.m + (1 - self.b1) * grad_wrt_w
+        self.v = self.b2 * self.v + (1 - self.b2) * np.power(grad_wrt_w, 2)
+
+        m_hat = self.m / (1 - self.b1)
+        v_hat = self.v / (1 - self.b2)
+
+        self.w_updt = self.learning_rate * m_hat / (np.sqrt(v_hat) + self.eps)
+
+        return w - self.w_updt
+
+

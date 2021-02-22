@@ -15,7 +15,7 @@ def accuracy(y_true, y_pred, matric=None, independent_regressors=None):
     :return: accuracy
     """
     accuracy = 0.0
-    pseudo_bias = 0.00001
+    pseudo_bias = 1e-15
 
     if len(y_true) != 0:
 
@@ -24,11 +24,11 @@ def accuracy(y_true, y_pred, matric=None, independent_regressors=None):
             accuracy = 1 - (1 / len(y_true)) * np.sum(np.abs(y_true - y_pred))
 
         elif matric == "R-squared":
-
-            accuracy = 1 - np.sum((y_true - y_pred) ** 2) / np.sum((y_true - np.mean(y_true)) ** 2)
+            denominator = np.sum((y_true - np.mean(y_true)) ** 2)
+            denominator = np.clip(denominator, pseudo_bias, denominator)
+            accuracy = 1 - np.sum((y_true - y_pred) ** 2) / denominator
 
         elif matric == "R-squared_adjusted":
-
             accuracy = 1 - (1 - np.sum((y_true - y_pred) ** 2) / np.sum((y_true - np.mean(y_true)) ** 2)) * (
                         len(y_true) - 1) / (len(y_true) - 1 - independent_regressors)
 
