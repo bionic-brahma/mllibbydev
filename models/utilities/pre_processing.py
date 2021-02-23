@@ -17,6 +17,28 @@ warnings.filterwarnings("ignore")
 
 #######################################################################################
 
+def subset_by_label():
+    pass
+
+
+# Function to split dataset for one vs res classification
+def OVOdatamaker(X, y):
+    """
+    The methode to split dataset into the subsets, n*(n-1) ubstes to perform ovo using any
+    binary classification method.
+    here n is the number of unique classes present in the dataset.
+    :param X: Dataset feature matrix containing features of the all records
+    :param y: The dataset labels in list format
+    :return: list containing data sets
+    """
+
+    unique = np.unique(y)
+
+
+
+
+
+
 
 # Function to search key in dataset.
 def SearchKeyIncolumns(dataset, key="NaN"):
