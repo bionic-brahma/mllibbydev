@@ -3,6 +3,7 @@ import os.path
 import sys
 
 class CompressPDF:
+
     def __init__(self, compress_level=0, show_info=False):
         """
         Constructor for the CompressPDF class.
