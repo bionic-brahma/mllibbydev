@@ -4,6 +4,11 @@ import sys
 
 class CompressPDF:
     def __init__(self, compress_level=0, show_info=False):
+        """
+        Constructor for the CompressPDF class.
+        :param compress_level: levels of compressor 0- follows default and 4- follows maximum compression
+        :param show_info: If true, the copression ratio will be shown in the terminal output
+        """
         self.compress_level = compress_level
 
         self.quality = {
@@ -74,7 +79,7 @@ class CompressPDF:
 if __name__ == '__main__':
 
     start_folder = "test/"
-    compress = 2
+    compress = 4
     p = CompressPDF(compress, show_info=True)
 
     compress_folder = os.path.join(start_folder, "test_out/")
