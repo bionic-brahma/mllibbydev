@@ -2,6 +2,59 @@ import random
 import numpy as np
 
 
+# Function to split dataset for one vs res classification
+def subsets_by_label(X, y):
+    """
+    The methode to split dataset into the subsets containing the same label per subset
+    It servers as a helper function for OvO and OvA approches of multiclass-classifications
+
+    :param X: Dataset feature matrix containing features of the all records
+    :param y: The dataset labels in list format
+    :return: list containing data sets
+    """
+    subsets_to_return = list()
+    unique = np.unique(y)
+    for i in unique:
+        X_sub_index = np.where(y == i, True, False)
+
+        try:
+
+            X_sub = X[X_sub_index]
+            Y_sub = y[X_sub_index]
+
+        except:
+
+            X_sub = X.iloc[X_sub_index]
+            Y_sub = y.iloc[X_sub_index]
+
+        subsets_to_return.append((X_sub, Y_sub))
+    return subsets_to_return
+
+
+def OVOdatamaker(X, y):
+    """
+    The methode to split dataset into the subsets, n*(n-1) ubstes to perform ovo using any
+    binary classification method.
+    here n is the number of unique classes present in the dataset.
+    :param X: Dataset feature matrix containing features of the all records
+    :param y: The dataset labels in list format
+    :return: list containing data sets
+    """
+    data_subsets = subsets_by_label(X, y)
+    OVOdatasets = list()
+    for i in range(len(data_subsets)):
+        for j in range(len(data_subsets)):
+            if i == j:
+                pass
+            else:
+                tem_joinX = np.concatenate((data_subsets[i][0], data_subsets[j][0]))
+                tem_joinY = np.concatenate((data_subsets[i][1], data_subsets[j][1]))
+
+                OVOdatasets.append((tem_joinX, tem_joinY))
+
+    return OVOdatasets
+
+
 def train_test_split_df(df, test_size=0.2, output_seperated='yes', label_name='label'):
     """
     ************** PARAMETER ***************
@@ -191,7 +244,7 @@ def k_cross_validation_split(X, y, test_size=None, k_value=2, shuffle=True):
     if k_value == len(y):
         print("[X] K value can not be same or greater than the number of records")
         return None
-    k_value+=1
+    k_value += 1
     if test_size is None:
         test_size = 1 / k_value
     if shuffle:
@@ -200,16 +253,14 @@ def k_cross_validation_split(X, y, test_size=None, k_value=2, shuffle=True):
     test = []
     number_of_test_records = int(len(y) * test_size)
 
-    for i in range(k_value-1):
-        test_X = X[i*number_of_test_records: (i+1)*number_of_test_records].tolist()
-        test_y = y[i*number_of_test_records: (i+1)*number_of_test_records].tolist()
+    for i in range(k_value - 1):
+        test_X = X[i * number_of_test_records: (i + 1) * number_of_test_records].tolist()
+        test_y = y[i * number_of_test_records: (i + 1) * number_of_test_records].tolist()
 
-        Ax= [x.tolist() for x in X[0:i*number_of_test_records]]
-        Bx= [x.tolist() for x in X[(i+1)*number_of_test_records:]]
+        Ax = [x.tolist() for x in X[0:i * number_of_test_records]]
+        Bx = [x.tolist() for x in X[(i + 1) * number_of_test_records:]]
         Ax.extend(Bx)
         train_X = Ax
-
-
 
         Ay = [x.tolist() for x in y[0:i * number_of_test_records]]
         By = [x.tolist() for x in y[(i + 1) * number_of_test_records:]]

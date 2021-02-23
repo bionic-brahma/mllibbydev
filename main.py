@@ -1,6 +1,6 @@
 from models.utilities.split import k_cross_validation_split, train_test_split
 from models.utilities.performance_matrices import accuracy, k_fold_validation_accuracy
-from models.utilities.pre_processing import OVOdatamaker, subsets_by_label
+from models.utilities.split import OVOdatamaker, subsets_by_label
 import numpy as np
 from models import svm
 
