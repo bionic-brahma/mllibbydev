@@ -6,10 +6,10 @@ import errno
 import subprocess
 
 # source directory to access files from
-source = os.path.dirname(os.path.realpath(__file__))+"/test_out"
+source = os.path.dirname(os.path.realpath(__file__))+"/test"
 
 # destination directory to save txt file to.
-destination = os.path.dirname(os.path.realpath(__file__))+"/test_out"
+destination = os.path.dirname(os.path.realpath(__file__))+"/test"
 
 # trying to import specific modules
 

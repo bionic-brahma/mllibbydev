@@ -38,7 +38,7 @@ class SVM:
 
         if len(unique) > 2:
             print(
-                "The number of lebels in the target variable is more than 2. please switch to LogisticMultiClassifier.")
+                "The number of lebels in the target variable is more than 2. please switch to SVMMultiClassifier.")
             return "[X]. Data is not for binary classifier."
 
         for i in range(len(unique)):
