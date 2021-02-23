@@ -2,6 +2,7 @@ import subprocess
 import os.path
 import sys
 
+
 class CompressPDF:
 
     def __init__(self, compress_level=0, show_info=False):
@@ -35,7 +36,6 @@ class CompressPDF:
         try:
 
             if not os.path.isfile(file):
-
                 print("Error: invalid path for input PDF file")
                 sys.exit(1)
 
@@ -43,11 +43,9 @@ class CompressPDF:
             filename, file_extension = os.path.splitext(file)
 
             if file_extension != '.pdf':
-
                 raise Exception("Error: input file is not a PDF")
 
             if self.show_compress_info:
-
                 initial_size = os.path.getsize(file)
 
             subprocess.call(['gs', '-sDEVICE=pdfwrite', '-dCompatibilityLevel=1.4',
@@ -58,7 +56,6 @@ class CompressPDF:
                             )
 
             if self.show_compress_info:
-
                 final_size = os.path.getsize(new_file)
                 ratio = 1 - (final_size / initial_size)
                 print("Compression by {0:.0%}.".format(ratio))
