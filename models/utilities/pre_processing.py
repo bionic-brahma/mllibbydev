@@ -31,8 +31,19 @@ def OVOdatamaker(X, y):
     :param y: The dataset labels in list format
     :return: list containing data sets
     """
-
+    subsets_to_return = list()
     unique = np.unique(y)
+    for i in unique:
+        X_sub_index = np.where(y == i, True, False)
+        try:
+            X_sub = X[X_sub_index]
+            Y_sub = y[X_sub_index]
+        except:
+            X_sub = X.iloc[X_sub_index]
+            Y_sub = y.iloc[X_sub_index]
+
+        subsets_to_return.append((X_sub, Y_sub))
+    return subsets_to_return
 
 
 

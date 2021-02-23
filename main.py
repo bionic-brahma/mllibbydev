@@ -1,11 +1,17 @@
 from models.utilities.split import k_cross_validation_split, train_test_split
 from models.utilities.performance_matrices import accuracy, k_fold_validation_accuracy
+from models.utilities.pre_processing import OVOdatamaker
 import numpy as np
 from models import svm
 
 model = svm.SVM()
 a = np.array([[1, 2], [2, 3], [2, 5], [6, 3], [7, 2], [8, 9], [1, 7], [11, 5], [1, 1], [5, 5], [90, 90]])
 b = np.array([5, 5, 5, 10, 10, 5, 5, 10, 2, 2, 2])
+
+#OVO testing
+dataset = OVOdatamaker(a, b)
+print(dataset[1][1])
+
 tr_x, tx, tr_y, ty = train_test_split(a, b)
 model.fit(tr_x, tr_y)
 print("predicted value for [10,100]:", model.predict([[10, 100]]))
