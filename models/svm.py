@@ -1,14 +1,14 @@
 ########################################################
-# Support vector machine by collaboration
-# for Risk Latte Americas Inc.
+# Support vector machine by collaboration   #
+# for Risk Latte Americas Inc.              #
 ########################################################
 
+from statistics import mode
 import numpy as np
-import json
-import ast
+from models.utilities.split import OVOdatamaker, shuffle_data
 
 
-class SVM:
+class SVM_base:
 
     def __init__(self, learning_rate=0.001, lambda_param=0.01, n_iters=1000):
         """
@@ -44,7 +44,6 @@ class SVM:
         for i in range(len(unique)):
             self.label_dict[i] = unique[i]
 
-        #print(self.label_dict)
         y_ = y
 
         for i in range(len(y)):
@@ -96,46 +95,56 @@ class SVM:
         return labels
 
 
-'''
-    def Save_Model(self, file_name):
+class SVM:
+
+    def __init__(self, learning_rate=0.001, lambda_param=0.01, n_iters=1000):
         """
-        This function saves the trained model in .json format.
-        :param file_name: File name (Without extension) along with the location address to save the model.
-        :return:
-        
+        This the constructor for SVM class.
 
-        model_data = {"model_param": str([self.w.tolist(), self.b])}
-        model_file = file_name + str(".json")
-        try:
-            with open(model_file, 'x') as modelfile:
-                json.dump(model_data, modelfile, indent=4)
-                print("model_saved sucessfully in file named : ", model_file)
-        except:
-
-            with open(model_file, 'w') as modelfile:
-                json.dump(model_data, modelfile, indent=4)
-                print("model_saved sucessfully in file named : ", model_file)
-
-    def Load_Model(self, file_name):
+        :param learning_rate: step size for weights and bias to update.
+        :param lambda_param: Lagrange multiplies' value
+        :param n_iters:  Number of iterations for training
         """
-        This function loads the already saved trained model.
-        :param file_name: location along with the file name(with extension)
-        :return: Boolean value, true is model loaded successfully or else false.
+        self.lr = learning_rate
+        self.lambda_param = lambda_param
+        self.n_iters = n_iters
+        self.w = None
+        self.b = None
+        self.label_dict = dict()
+        self.models = list()
+
+    def fit(self, X, y):
         """
+        Fits the tree as per the training data.
+        :param X: Feature matrix of the data. format--> [[1st rec], [2nd record],...]
+        :param y: Data labels for the corresponding feature matrix. format [1st label, 2nd label,...]
+        :return: None
+        """
+        datasets_by_OVO = OVOdatamaker(X, y)
+        self.models = list()
+        for i in range(len(datasets_by_OVO)):
+            tempX = datasets_by_OVO[i][0]
+            tempY = datasets_by_OVO[i][1]
+            tempX, tempY = shuffle_data(tempX, tempY, len(datasets_by_OVO))
+            model = SVM_base(learning_rate=self.lr, lambda_param=self.lambda_param, n_iters=self.n_iters)
+            model.fit(tempX, tempY)
+            self.models.append(model)
 
-        try:
+    def predict(self, X):
+        """
+        Make the classification for the give input feature vector
+        :param X: Feature vector to make classification on
+        :return: Label for the feature vector
+        """
+        predicted_labels = list()
+        predicted_outputs = list()
+        for i in range(len(self.models)):
+            pred_y = self.models[i].predict(X)
+            predicted_labels.append(pred_y)
 
-            with open(file_name, "r") as model_file:
-                data = json.load(model_file)
+        for j in range(len(X)):
+            predicted_outputs.append(mode(np.array(predicted_labels)[:, j]))
 
-                params = ast.literal_eval(data["model_param"])
+        return predicted_outputs
 
-                self.w, self.b = params[0], params[1]
-                print("model loaded sucessfully")
-                return True
 
-        except:
-
-            print("model loading failed")
-            return False
-            '''''
