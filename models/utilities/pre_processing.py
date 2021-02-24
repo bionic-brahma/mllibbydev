@@ -7,15 +7,114 @@
 # Please disable the next block while amending this file so that proper
 # test_out can happen.
 #######################################################################################
-
-# The block suppresses the warning on runtime
 import warnings
 import numpy as np
+import random
+import math
+from random import randint
+
+# The block suppresses the warning on runtime
 
 warnings.filterwarnings("ignore")
 
 
 #######################################################################################
+
+
+class smote:
+
+    def __init__(self):
+        """
+        Constructor for the smote class
+        """
+        self.index_new = 0
+        self.synthetic_data = list()
+
+    def generate_records(self, No_of_records, i, indices, minority_class, k_points):
+        """
+        This method generates the data for the output dataset.
+
+        :param No_of_records: number of records to be generated
+        :param i: the index of the record around which the new records needed to be generated
+        :param indices: the record that is indexed
+        :param minority_class: sample data, usually the minority class data feature matrix
+        :param k_points: number of nearest points that are to be considered.
+        :return: None
+        """
+
+        while No_of_records != 0:
+            features = len(minority_class[0])
+            arr = []
+            nn = randint(0, k_points - 2)
+
+            for attr in range(features):
+                difference = minority_class[indices[nn]][attr] - minority_class[i][attr]
+                gap = random.uniform(0, 1)
+                arr.append(minority_class[i][attr] + gap * difference)
+
+            self.synthetic_data.append(arr)
+            self.index_new = self.index_new + 1
+            No_of_records = No_of_records - 1
+
+    def k_neighbors(self, euclid_distance, k):
+        """
+        calculates the distance between points and returns k closest points
+        :param euclid_distance:
+        :param k: number of nearest points that are to be considered.
+        :return: k points that are closest
+        """
+        nearest_idx_npy = np.empty([euclid_distance.shape[0], euclid_distance.shape[0]], dtype=np.int64)
+
+        for i in range(len(euclid_distance)):
+            idx = np.argsort(euclid_distance[i])
+            nearest_idx_npy[i] = idx
+            idx = 0
+
+        return nearest_idx_npy[:, 1:k]
+
+    def find_k(self, X, k):
+        """
+        Finds k nearest neighbors using euclidean distance
+        :param X: the feature matrix
+        :param k: number of nearest neighbors
+        :return: The k nearest neighbor
+        """
+
+        euclid_distance = np.empty([np.array(X).shape[0], np.array(X).shape[0]], dtype=np.float32)
+
+        for i in range(len(X)):
+            dist_arr = []
+            for j in range(len(X)):
+                dist_arr.append(math.sqrt(sum((np.array(X)[j] - np.array(X)[i]) ** 2)))
+            dist_arr = np.asarray(dist_arr, dtype=np.float32)
+            euclid_distance[i] = dist_arr
+
+        return self.k_neighbors(euclid_distance, k)
+
+    def generate_synthetic_points(self, minority_data_sample, percentage_of_data_returned, k_points):
+        """
+        This method generates (percentage_of_data_returned/100) * minority_data_sample synthetic minority samples.
+        :param minority_data_sample: sample data, usually the minority class data feature matrix
+        :param percentage_of_data_returned: this tells how much synthetic data will be return.
+        :param k_points: number of nearest points that are to be considered.
+        :return: (percentage_of_data_returned/100) * minority_data_sample synthetic minority samples.
+        """
+
+        if percentage_of_data_returned < 100:
+            raise ValueError("Value of N cannot be less than 100%")
+
+        if k_points > np.array(minority_data_sample).shape[0]:
+            raise ValueError("Size of k cannot exceed the number of samples.")
+
+        percentage_of_data_returned = int(percentage_of_data_returned / 100)
+        T = np.array(minority_data_sample).shape[0]
+
+        indices = self.find_k(minority_data_sample, k_points)
+
+        for i in range(indices.shape[0]):
+            self.generate_records(percentage_of_data_returned, i, indices[i], minority_data_sample, k_points)
+
+        return np.asarray(self.synthetic_data)
 
 
 # Function to search key in dataset.
@@ -33,7 +132,7 @@ def SearchKeyIncolumns(dataset, key="NaN"):
     # Making a copy of data to maintain integrity of original data
     data = dataset.copy()
 
-    # Taking columns name 
+    # Taking columns name
     cols = data.columns
 
     # This dictionary will store columns names as key and value as frequency of the occurence of "key"
@@ -54,7 +153,7 @@ def SearchKeyIncolumns(dataset, key="NaN"):
     return column_search_freq_dictionary
 
 
-# Function to filter the data by columns on key density basis. 
+# Function to filter the data by columns on key density basis.
 def RelevanceColumnFilter(dataset, key="NaN", filter_threshold=0.8):
     """Performs column deletion based of the density of key
 
@@ -94,7 +193,7 @@ def RelevanceColumnFilter(dataset, key="NaN", filter_threshold=0.8):
     return data
 
 
-# Function to handle missing values. 
+# Function to handle missing values.
 def ReplaceMeanAndMode(dataset, key='NaN'):
     """Handles the missing values(NaN or any value given in key)
 
@@ -110,10 +209,10 @@ def ReplaceMeanAndMode(dataset, key='NaN'):
 
     """
 
-    # Creating a copy of original data to maintain its intigrity.   
+    # Creating a copy of original data to maintain its intigrity.
     data = dataset.copy()
 
-    # Taking columns name 
+    # Taking columns name
     cols = data.columns
 
     for i in cols:
@@ -133,7 +232,7 @@ def ReplaceMeanAndMode(dataset, key='NaN'):
                 count = sum([1.0 for x in np.array(data[i]) if x != key])
                 mean = total / count
 
-                # Replacing key (missing value) with mean. 
+                # Replacing key (missing value) with mean.
                 data[i].replace(key, mean, inplace=True)
 
             # This block runs for the categorical parameters
@@ -152,7 +251,7 @@ def ReplaceMeanAndMode(dataset, key='NaN'):
     return data
 
 
-# Function to find elements of one list that are not in other list. 
+# Function to find elements of one list that are not in other list.
 def Diff(list1, list2):
     """Returns the difference(List1-List is set notation) of two list.
 
@@ -187,7 +286,7 @@ def GetAttributesInCategory(dataset, target_attribute, include_target_attribute=
     # Creating a copy of original data to maintain its integrity.
     data = dataset.copy()
 
-    # Taking columns name 
+    # Taking columns name
     cols = data.columns
 
     # This list will have categorical attributes' names
