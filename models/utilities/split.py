@@ -31,6 +31,30 @@ def subsets_by_label(X, y):
     return subsets_to_return
 
 
+def dataset_by_single_label(X, y, label):
+    """
+    This method returns the a subset containing the label given in the arguments
+
+    :param X: Dataset feature matrix containing features of the all records
+    :param y: The dataset labels in list format
+    :param label: the label for which you want to return subset
+    :return: data sets in X, y format containing only given label
+    """
+    X_sub_index = np.where(y == label, True, False)
+
+    try:
+
+        X_sub = X[X_sub_index]
+        Y_sub = y[X_sub_index]
+
+    except:
+
+        X_sub = X.iloc[X_sub_index]
+        Y_sub = y.iloc[X_sub_index]
+
+    return X_sub, Y_sub
+
+
 def OVOdatamaker(X, y):
     """
     The methode to split dataset into the subsets, n*(n-1) ubstes to perform ovo using any
