@@ -38,7 +38,7 @@ def datetime_formator(datetime, format_given=None):
     date_time_detailes_dict = dict()
     keys_for_date_time = ["day", "month", "year", "hour", "minute", "second", "milliseconds"]
     datetime_copy = datetime
-    datetime_splited = re.split(":|/|\\|-| |.|,|  ", datetime_copy)
+    datetime_splited = re.split(':|/| |', datetime_copy)
 
     if format_given is None:
 
@@ -50,7 +50,7 @@ def datetime_formator(datetime, format_given=None):
 
     else:
         date_time_formating = re.split(":|/|\\|-| |.|,|  ", format_given)
-        print("\n+++++++++++++++++++++++++++\n",date_time_formating)
+
         for i in range(len(datetime_splited)):
             try:
                 if date_time_formating[i] == "MM":
@@ -67,10 +67,9 @@ def datetime_formator(datetime, format_given=None):
                     date_time_detailes_dict["second"] = datetime_splited[i]
             except:
                 pass
-    print(date_time_detailes_dict)
     output_date_time_formating = str(date_time_detailes_dict["day"]) + "-" + str(date_time_detailes_dict["month"]) + "-" \
                                  + str(date_time_detailes_dict["year"]) + " " + str(date_time_detailes_dict["hour"]) + \
-                                 "-" + str(date_time_detailes_dict["minute"]) + "-" + str(
+                                 ":" + str(date_time_detailes_dict["minute"]) + ":" + str(
         date_time_detailes_dict["second"])
 
     return output_date_time_formating
