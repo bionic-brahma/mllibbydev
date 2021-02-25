@@ -75,13 +75,14 @@ def datetime_formator(datetime, format_given=None):
     return output_date_time_formating
 
 
-class upsampling:
+class oversampling:
 
     def __init__(self, method=None):
         """
         Constructor for the smote class
         """
-        if method is None:
+        self.method = method
+        if self.method is None:
             self.method = "smote"
         self.index_new = 0
         self.synthetic_data = list()
@@ -106,7 +107,16 @@ class upsampling:
             for attr in range(features):
                 difference = minority_class[indices[nn]][attr] - minority_class[i][attr]
                 gap = random.uniform(0, 1)
-                arr.append(minority_class[i][attr] + gap * difference)
+
+                if self.method == "adasyn":
+                    randomness_in_features = random.gauss(difference/2, 0.1*difference)
+                    new_feat = minority_class[i][attr] + gap * difference + randomness_in_features
+                elif self.method == "smote":
+                    new_feat = minority_class[i][attr] + gap * difference
+                else:
+                    print("[X]Error: Please take method for upsampling - smote or adasyn")
+                    return
+                arr.append(new_feat)
 
             self.synthetic_data.append(arr)
             self.index_new = self.index_new + 1
