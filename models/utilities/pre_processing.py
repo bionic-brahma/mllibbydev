@@ -75,12 +75,14 @@ def datetime_formator(datetime, format_given=None):
     return output_date_time_formating
 
 
-class smote:
+class upsampling:
 
-    def __init__(self):
+    def __init__(self, method=None):
         """
         Constructor for the smote class
         """
+        if method is None:
+            self.method = "smote"
         self.index_new = 0
         self.synthetic_data = list()
 
