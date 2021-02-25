@@ -21,60 +21,59 @@ warnings.filterwarnings("ignore")
 
 #######################################################################################
 
-def datetime_formator(datetime, format_given=None, format_to_convert_to=None):
+def datetime_formator(datetime, format_given=None):
     """
-    This method converts the given formate of date - time to the required format.
+    This method converts the given formate of date - time to the standard format.
 
     :param datetime: datetime which is needed to be converted.
     :param format_given: format of the given date time
-                            mm - > months
-                            yyyy -> year
-                            dd -> day
+                            MM - > months
+                            YYYY -> year
+                            DD -> day
                             hh -> hours
                             mm -> minutes
                             ss -> seconds
-    :param format_to_convert_to: format to which you need to convert the date time
-                            mm - > months
-                            yyyy -> year
-                            dd -> day
-                            hh -> hours
-                            mm -> minutes
-                            ss -> seconds
-    :return: reformated date-time in string form
+    :return: reformatted date-time in string form
     """
-    date = None
-    day = None
-    month = None
-    year = None
-    time = None
-    hour = None
-    minute = None
-    second = None
+    date_time_detailes_dict = dict()
+    keys_for_date_time = ["day", "month", "year", "hour", "minute", "second", "milliseconds"]
+    datetime_copy = datetime
+    datetime_splited = re.split(":|/|\\|-| |.|,|  ", datetime_copy)
 
     if format_given is None:
-        datetime_copy = datetime
-        date_components = str(datetime_copy).split(" ")
-        if len(date_components) > 1:
-            date = date_components[0]
-            date_components1 = date.split(":|/|- ")
 
-            if len(date_components1) > 1:
-                if date_components1[0] != "":
-                    day = date_components1[0]
-                if date_components1[1] != "":
-                    month = date_components1[1]
-                if date_components1[2] != "":
-                    month = date_components1[2]
+        for i in range(len(keys_for_date_time)):
+            try:
+                date_time_detailes_dict[keys_for_date_time[i]] = datetime_splited[i]
+            except:
+                pass
 
-            time = date_components[1]
-        else:
-            datetime_copy = datetime
-            date_components = str(datetime_copy).split(":")
-            if len(date_components) > 1:
+    else:
+        date_time_formating = re.split(":|/|\\|-| |.|,|  ", format_given)
+        print("\n+++++++++++++++++++++++++++\n",date_time_formating)
+        for i in range(len(datetime_splited)):
+            try:
+                if date_time_formating[i] == "MM":
+                    date_time_detailes_dict["month"] = datetime_splited[i]
+                if date_time_formating[i] == "DD":
+                    date_time_detailes_dict["day"] = datetime_splited[i]
+                if date_time_formating[i] == "YYYY":
+                    date_time_detailes_dict["year"] = datetime_splited[i]
+                if date_time_formating[i] == "hh":
+                    date_time_detailes_dict["hour"] = datetime_splited[i]
+                if date_time_formating[i] == "mm":
+                    date_time_detailes_dict["minute"] = datetime_splited[i]
+                if date_time_formating[i] == "ss":
+                    date_time_detailes_dict["second"] = datetime_splited[i]
+            except:
+                pass
+    print(date_time_detailes_dict)
+    output_date_time_formating = str(date_time_detailes_dict["day"]) + "-" + str(date_time_detailes_dict["month"]) + "-" \
+                                 + str(date_time_detailes_dict["year"]) + " " + str(date_time_detailes_dict["hour"]) + \
+                                 "-" + str(date_time_detailes_dict["minute"]) + "-" + str(
+        date_time_detailes_dict["second"])
 
-
-
-
+    return output_date_time_formating
 
 
 class smote:
