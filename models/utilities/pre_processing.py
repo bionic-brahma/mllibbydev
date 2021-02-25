@@ -12,6 +12,7 @@ import numpy as np
 import random
 import math
 from random import randint
+import re
 
 # The block suppresses the warning on runtime
 
@@ -20,7 +21,7 @@ warnings.filterwarnings("ignore")
 
 #######################################################################################
 
-def datetime_formator(datetime, format_given, format_to_convert_to):
+def datetime_formator(datetime, format_given=None, format_to_convert_to=None):
     """
     This method converts the given formate of date - time to the required format.
 
@@ -41,6 +42,38 @@ def datetime_formator(datetime, format_given, format_to_convert_to):
                             ss -> seconds
     :return: reformated date-time in string form
     """
+    date = None
+    day = None
+    month = None
+    year = None
+    time = None
+    hour = None
+    minute = None
+    second = None
+
+    if format_given is None:
+        datetime_copy = datetime
+        date_components = str(datetime_copy).split(" ")
+        if len(date_components) > 1:
+            date = date_components[0]
+            date_components1 = date.split(":|/|- ")
+
+            if len(date_components1) > 1:
+                if date_components1[0] != "":
+                    day = date_components1[0]
+                if date_components1[1] != "":
+                    month = date_components1[1]
+                if date_components1[2] != "":
+                    month = date_components1[2]
+
+            time = date_components[1]
+        else:
+            datetime_copy = datetime
+            date_components = str(datetime_copy).split(":")
+            if len(date_components) > 1:
+
+
+
 
 
 
