@@ -3,7 +3,6 @@
 # for Risk Latte Americas Inc.              #
 ########################################################
 
-from statistics import mode
 import numpy as np
 from models.utilities.split import OVOdatamaker, shuffle_data
 
@@ -44,14 +43,13 @@ class SVM_base:
         for i in range(len(unique)):
             self.label_dict[i] = unique[i]
 
-        y_ = y
-
         for i in range(len(y)):
             if y[i] == unique[0]:
                 y[i] = 0
             else:
                 y[i] = 1
-
+        y = y.astype('int64')
+        y_ = y
         for i in range(len(y)):
             if y[i] <= 0:
                 y_[i] = -1
@@ -143,8 +141,23 @@ class SVM:
             predicted_labels.append(pred_y)
 
         for j in range(len(X)):
-            predicted_outputs.append(mode(np.array(predicted_labels)[:, j]))
+            predicted_outputs.append(mode_in_labels(np.array(predicted_labels)[:, j]))
 
         return predicted_outputs
 
 
+def mode_in_labels(arr):
+    set_labels = set(arr)
+    freq_dict= dict()
+    for i in set_labels:
+        freq_dict[i] = 0
+    for i in arr:
+        freq_dict[i] += 1
+    maxi = 0
+    keytoreturn = 0
+    for key, value in freq_dict.items():
+        if maxi <= value:
+            keytoreturn = key
+            maxi = value
+
+    return keytoreturn
