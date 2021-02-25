@@ -20,6 +20,29 @@ warnings.filterwarnings("ignore")
 
 #######################################################################################
 
+def datetime_formator(datetime, format_given, format_to_convert_to):
+    """
+    This method converts the given formate of date - time to the required format.
+
+    :param datetime: datetime which is needed to be converted.
+    :param format_given: format of the given date time
+                            mm - > months
+                            yyyy -> year
+                            dd -> day
+                            hh -> hours
+                            mm -> minutes
+                            ss -> seconds
+    :param format_to_convert_to: format to which you need to convert the date time
+                            mm - > months
+                            yyyy -> year
+                            dd -> day
+                            hh -> hours
+                            mm -> minutes
+                            ss -> seconds
+    :return: reformated date-time in string form
+    """
+
+
 
 class smote:
 
