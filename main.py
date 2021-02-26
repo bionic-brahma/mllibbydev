@@ -1,23 +1,29 @@
 from models.svm import SVM, mode_in_labels
-from models.utilities.split import k_cross_validation_split, train_test_split, dataset_by_single_label
-from models.utilities.performance_matrices import accuracy, k_fold_validation_accuracy
+from models.utilities.split import k_cross_validation_split, train_test_split, dataset_by_single_label, subsets_by_label
+from models.utilities.performance_matrices import accuracy, k_fold_validation_accuracy, confusion_matrix
 from models.utilities.split import OVOdatamaker, subsets_by_label
-from models.utilities.pre_processing import oversampling, datetime_formator
+from models.utilities.pre_processing import oversampling, datetime_formator, auto_oversample
+import pandas as pd
 import numpy as np
+dataframe = pd.read_csv("Trained_model/test/Thyroid.csv")
+labels = dataframe['label']
+dataframe.drop('label', axis=1, inplace=True)
+xfeat = dataframe
+#print(np.unique(labels))
+xfeat = np.array([[2,2,2],[1,1,1],[3,3,3],[4,4,4],[5,5,5],[6,6,6],[7,7,7],[8,8,8],[9,9,9],[0,0,0],[10,10,10],[1,2,3],[2,3,4],[5,6,7],[5,6,8]])
+labels = np.array(["dev","dev","dev","dev","dev","dev","dev","dev","dev","dev","dev","arjun","arjun","arjun","arjun"])
+#oversampled_dataX, oversampled_dataY = auto_oversample(xfeat, labels)
+print(len(xfeat), len(labels))
+trx, testx, tr_y, testy = train_test_split(xfeat, labels, shuffle=True)
 
-transformer1 = oversampling(method="adasyn")
-data1 = transformer1.generate_synthetic_points([[1, 2], [2, 3], [2, 5], [6, 3], [7, 2], [8, 9], [1, 7]],500,3)
-transformer2 = oversampling(method="smote")
-data2 = transformer2.generate_synthetic_points([[1, 2], [2, 3], [2, 5], [6, 3], [7, 2], [8, 9], [1, 7]],500,3)
-print(np.concatenate((np.array(data1), np.array(data2)), axis=1))
-a = np.array([[1, 2], [2, 3], [2, 5], [6, 3], [7, 2], [8, 9], [1, 7], [11, 5], [1, 1], [5, 5], [90, 90]])
-b = np.array([2, 2, 2, 10, 10, 2, 2, 10, "dev", "dev", "dev"])
-#datax, datay = dataset_by_single_label(a,b,10)
-#print(datax,datay)
+X, y = auto_oversample(np.array(xfeat), np.array(labels), kpoint=2)
 
-date = "11:03/2005 23 09 56"
-print(datetime_formator(date))
-model = SVM()
-model.fit(a,b)
-print("predicted value for [100,100]:", model.predict([[100, 100]]))
+#print(subsets_by_label(trx,tr_y))
+#model = SVM()
+#model.fit(trx, tr_y)
+#predicted = model.predict(testx)
+
+#print("Accuracy: ", accuracy(testy, predicted))
+#confusion_matrix(testy, predicted)
+
 

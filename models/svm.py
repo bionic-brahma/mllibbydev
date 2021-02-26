@@ -4,6 +4,7 @@
 ########################################################
 
 import numpy as np
+from tqdm import tqdm
 from models.utilities.split import OVOdatamaker, shuffle_data
 
 
@@ -120,7 +121,7 @@ class SVM:
         """
         datasets_by_OVO = OVOdatamaker(X, y)
         self.models = list()
-        for i in range(len(datasets_by_OVO)):
+        for i in tqdm(range(len(datasets_by_OVO)), desc= "Training..."):
             tempX = datasets_by_OVO[i][0]
             tempY = datasets_by_OVO[i][1]
             tempX, tempY = shuffle_data(tempX, tempY, len(datasets_by_OVO))

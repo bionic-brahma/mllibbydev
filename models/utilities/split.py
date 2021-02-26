@@ -10,7 +10,7 @@ def subsets_by_label(X, y):
 
     :param X: Dataset feature matrix containing features of the all records
     :param y: The dataset labels in list format
-    :return: list containing data sets
+    :return: list containing data sets, list of labels to give the order by label info
     """
     subsets_to_return = list()
     unique = np.unique(y)
@@ -28,7 +28,7 @@ def subsets_by_label(X, y):
             Y_sub = y.iloc[X_sub_index]
 
         subsets_to_return.append((X_sub, Y_sub))
-    return subsets_to_return
+    return subsets_to_return, unique
 
 
 def dataset_by_single_label(X, y, label):
@@ -64,7 +64,7 @@ def OVOdatamaker(X, y):
     :param y: The dataset labels in list format
     :return: list containing data sets
     """
-    data_subsets = subsets_by_label(X, y)
+    data_subsets, _ = subsets_by_label(X, y)
     OVOdatasets = list()
     for i in range(len(data_subsets)):
         for j in range(len(data_subsets)):

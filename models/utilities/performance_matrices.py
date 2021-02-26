@@ -30,7 +30,7 @@ def accuracy(y_true, y_pred, matric=None, independent_regressors=None):
 
         elif matric == "R-squared_adjusted":
             accuracy = 1 - (1 - np.sum((y_true - y_pred) ** 2) / np.sum((y_true - np.mean(y_true)) ** 2)) * (
-                        len(y_true) - 1) / (len(y_true) - 1 - independent_regressors)
+                    len(y_true) - 1) / (len(y_true) - 1 - independent_regressors)
 
         elif matric == "MSE":
 
@@ -39,13 +39,13 @@ def accuracy(y_true, y_pred, matric=None, independent_regressors=None):
         else:
             sum_correct = 0
             for i in range(len(y_true)):
-                #print(y_true)
-                #print(y_pred)
+                # print(y_true)
+                # print(y_pred)
                 if y_true[i] == y_pred[i]:
-                    sum_correct +=1
+                    sum_correct += 1
             accuracy = sum_correct / len(y_true)
 
-        return accuracy*100
+        return accuracy * 100
 
     else:
         return accuracy
@@ -63,20 +63,41 @@ def confusion_matrix(actual, predicted):
     matrix = [list() for x in range(len(unique))]
 
     for i in range(len(unique)):
-
         matrix[i] = [0 for x in range(len(unique))]
 
     lookup = dict()
 
     for i, value in enumerate(unique):
-
         lookup[value] = i
 
     for i in range(len(actual)):
-
         x = lookup[actual[i]]
         y = lookup[predicted[i]]
         matrix[y][x] += 1
+
+    true_predicted = dict()
+    false_predicted = dict()
+    actual_total = dict()
+    recall = dict()
+    precision = dict()
+    predicted_total = dict()
+    F1_score = dict()
+
+    for i, value in enumerate(unique):
+        true_predicted[value] = matrix[i][i]
+        false_predicted[value] = sum(np.array(matrix)[:, i]) - matrix[i][i]
+        actual_total[value] = sum(np.array(matrix)[i, :])
+        predicted_total[value] = sum(np.array(matrix)[:, i])
+        recall[value] = true_predicted[value] / actual_total[value]
+        precision[value] = true_predicted[value] / predicted_total[value]
+        F1_score[value] = 2 * precision[value] * recall[value] / (precision[value] + recall[value])
+
+    print("F1 score: ")
+    print(F1_score)
+    print("Recall: ")
+    print(recall)
+    print("Precision: ")
+    print(precision)
 
     return unique, matrix
 
@@ -104,3 +125,4 @@ def k_fold_validation_accuracy(list_actual_y, list_predicted, matric=None, indep
         return k_fold_validation_acc, tolerance
     else:
         return k_fold_validation_acc
+

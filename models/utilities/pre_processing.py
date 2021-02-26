@@ -12,6 +12,7 @@ import numpy as np
 import random
 import math
 from random import randint
+import models.utilities.split as sp
 import re
 
 # The block suppresses the warning on runtime
@@ -109,7 +110,7 @@ class oversampling:
                 gap = random.uniform(0, 1)
 
                 if self.method == "adasyn":
-                    randomness_in_features = random.gauss(difference/2, 0.1*difference)
+                    randomness_in_features = random.gauss(difference / 2, 0.1 * difference)
                     new_feat = minority_class[i][attr] + gap * difference + randomness_in_features
                 elif self.method == "smote":
                     new_feat = minority_class[i][attr] + gap * difference
@@ -136,7 +137,7 @@ class oversampling:
             nearest_idx_npy[i] = idx
             idx = 0
 
-        return nearest_idx_npy[:, 1:k]
+        return nearest_idx_npy[:, 1:int(k)]
 
     def find_k(self, X, k):
         """
@@ -157,20 +158,21 @@ class oversampling:
 
         return self.k_neighbors(euclid_distance, k)
 
-    def generate_synthetic_points(self, minority_data_sample, percentage_of_data_returned, k_points):
+    def generate_synthetic_points(self, minority_data_sample, percentage_of_data_increased, k_points):
         """
         This method generates (percentage_of_data_returned/100) * minority_data_sample synthetic minority samples.
         :param minority_data_sample: sample data, usually the minority class data feature matrix
-        :param percentage_of_data_returned: this tells how much synthetic data will be return.
+        :param percentage_of_data_increased: this tells how much synthetic data will be return in addition to
+                                            number of original records.
         :param k_points: number of nearest points that are to be considered.
         :return: (percentage_of_data_returned/100) * minority_data_sample synthetic minority samples.
         """
-
+        percentage_of_data_returned = 100 + percentage_of_data_increased
         if percentage_of_data_returned < 100:
-            raise ValueError("Value of N cannot be less than 100%")
+            raise ValueError("increase in data cannot be less than 0%")
 
         if k_points > np.array(minority_data_sample).shape[0]:
-            raise ValueError("Size of k cannot exceed the number of samples.")
+            raise ValueError("Size of k_points cannot exceed the number of samples.")
 
         percentage_of_data_returned = int(percentage_of_data_returned / 100)
         T = np.array(minority_data_sample).shape[0]
@@ -181,6 +183,54 @@ class oversampling:
             self.generate_records(percentage_of_data_returned, i, indices[i], minority_data_sample, k_points)
 
         return np.asarray(self.synthetic_data)
+
+
+def auto_oversample(x, y, class_ratio_threshold=0.3, increase_to_ratio=0.60, kpoint=5):
+    """
+
+    :param x:
+    :param y:
+    :param class_ratio_threshold:
+    :param increase_to_ratio:
+    :return:
+    """
+    increase_to_ratio = 100 * increase_to_ratio
+    synth = oversampling()
+    total_number_of_rec = len(y)
+    subsets, labels_order = sp.subsets_by_label(x, y)
+    #print(subsets)
+    label_rec_counts = dict()
+    classes_to_oversample = list()
+
+    for label in labels_order:
+        label_rec_counts[label] = 0
+
+    returnX = None
+    returny = None
+
+    for class_recods_set, label in zip(subsets, labels_order):
+
+        label_rec_counts[label] = len(class_recods_set[0])
+        print("Label:-->", label, "  Count:-->", label_rec_counts[label])
+
+        if label_rec_counts[label] < class_ratio_threshold * total_number_of_rec:
+            classes_to_oversample.append(label)
+            print(increase_to_ratio, total_number_of_rec, label_rec_counts[label])
+            percent_increase = 100*(increase_to_ratio * total_number_of_rec - 100 * label_rec_counts[label]) \
+                               / (100 * label_rec_counts[label] - increase_to_ratio * label_rec_counts[label])
+            print("percent increace=", percent_increase)
+
+            generated_syth_data = synth.generate_synthetic_points(class_recods_set[0],
+                                                                  percentage_of_data_increased=percent_increase,
+                                                                  k_points=kpoint)
+            print(generated_syth_data)
+            class_recods_set[0] = generated_syth_data
+            class_recods_set[1] = [label for _ in range(len(generated_syth_data))]
+
+        returnX = np.concatenate((class_recods_set[0], returnX), axis=0)
+        returny = np.concatenate((class_recods_set[1], returny), axis=0)
+
+    return returnX, returny
 
 
 # Function to search key in dataset.
