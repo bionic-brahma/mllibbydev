@@ -185,9 +185,10 @@ class oversampling:
         return np.asarray(self.synthetic_data)
 
 
-def auto_oversample(x, y, class_ratio_threshold=0.3, increase_to_ratio=0.60, kpoint=5):
+def auto_oversample(x, y, class_ratio_threshold=0.3, increase_to_ratio=0.30, kpoint=5, method=None):
     """
 
+    :param method:
     :param x:
     :param y:
     :param class_ratio_threshold:
@@ -195,7 +196,7 @@ def auto_oversample(x, y, class_ratio_threshold=0.3, increase_to_ratio=0.60, kpo
     :return:
     """
     increase_to_ratio = 100 * increase_to_ratio
-    synth = oversampling()
+    synth = oversampling(method=method)
     total_number_of_rec = len(y)
     subsets, labels_order = sp.subsets_by_label(x, y)
     # print(subsets)
@@ -211,15 +212,15 @@ def auto_oversample(x, y, class_ratio_threshold=0.3, increase_to_ratio=0.60, kpo
     for class_recods_set, label in zip(subsets, labels_order):
 
         label_rec_counts[label] = len(class_recods_set[0])
-        #print("Label:-->", label, "  Count:-->", label_rec_counts[label])
+        print("Label:-->", label, "  Count:-->", label_rec_counts[label])
         tempx = class_recods_set[0]
         tempy = class_recods_set[1]
         if label_rec_counts[label] < class_ratio_threshold * total_number_of_rec:
             classes_to_oversample.append(label)
-            #print(increase_to_ratio, total_number_of_rec, label_rec_counts[label])
+            print(increase_to_ratio, total_number_of_rec, label_rec_counts[label])
             percent_increase = 100 * (increase_to_ratio * total_number_of_rec - 100 * label_rec_counts[label]) \
                                / (100 * label_rec_counts[label] - increase_to_ratio * label_rec_counts[label])
-            #print("percent increace=", percent_increase)
+            print("percent increace=", percent_increase)
 
             generated_syth_data = synth.generate_synthetic_points(class_recods_set[0],
                                                                   percentage_of_data_increased=percent_increase,
@@ -236,7 +237,7 @@ def auto_oversample(x, y, class_ratio_threshold=0.3, increase_to_ratio=0.60, kpo
             returnX = tempx
         else:
             returnX = np.concatenate((tempx, returnX), axis=0)
-
+    returnX, returny = sp.shuffle_data(returnX, returny)
     return returnX, returny
 
 
