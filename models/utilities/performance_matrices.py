@@ -51,6 +51,10 @@ def accuracy(y_true, y_pred, matric=None, independent_regressors=None):
         return accuracy
 
 
+def F_Beta_score(precision, recall, beta=1):
+    return (1 + beta ** 2) * (precision * recall) / ((beta ** 2) * precision + recall)
+
+
 def confusion_matrix(actual, predicted):
     """
     This function computes the confusion matrix for the given predicted
@@ -90,7 +94,7 @@ def confusion_matrix(actual, predicted):
         predicted_total[value] = sum(np.array(matrix)[:, i])
         recall[value] = true_predicted[value] / actual_total[value]
         precision[value] = true_predicted[value] / predicted_total[value]
-        F1_score[value] = 2 * precision[value] * recall[value] / (precision[value] + recall[value])
+        F1_score[value] = F_Beta_score(precision[value], recall[value])
 
     print("F1 score: ")
     print(F1_score)
@@ -125,4 +129,3 @@ def k_fold_validation_accuracy(list_actual_y, list_predicted, matric=None, indep
         return k_fold_validation_acc, tolerance
     else:
         return k_fold_validation_acc
-
