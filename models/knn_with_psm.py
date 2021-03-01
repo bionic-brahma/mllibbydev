@@ -93,7 +93,7 @@ class KNN:
 
     # compute patient similarity matrix of v1 to v2: (v1 dot v2)/{||v1||*||v2||)
     # this is the direction/orientation similarity
-    def PSM(self, v1, v2):
+    def cosine_sim(self, v1, v2):
         return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v1))
 
     # Shorting the similarity in descending order
@@ -109,7 +109,7 @@ class KNN:
         else:
             return 0
 
-    # Feature similarity 
+    # Feature similarity for age
     def FS_A(self, a, b):
         return (min(a, b) / max(a, b))
 
@@ -117,7 +117,7 @@ class KNN:
         W = [0.4, 0.1, 0.1]  # weight as per the Wang et al. BioMed Eng OnLine paper
         similarity = []
         for i in range(0, n_sample):
-            temp = W[1] * self.FS_S(x[i, 0], testdata[0]) + W[2] * self.FS_A(x[i, 1], testdata[1]) + W[0] * self.PSM(
+            temp = W[1] * self.FS_S(x[i, 0], testdata[0]) + W[2] * self.FS_A(x[i, 1], testdata[1]) + W[0] * self.cosine_sim(
                 x[i, 2:], testdata[2:])
             similarity.append([temp, self.y[i]])
         return self.Srt(similarity)
@@ -125,7 +125,7 @@ class KNN:
     def getNeighbours_unWeighted(self, testdata, x, n_sample):
         similarity = []
         for i in range(0, n_sample):
-            similarity.append([self.PSM(x[i], testdata), self.y[i]])
+            similarity.append([self.cosine_sim(x[i], testdata), self.y[i]])
         return self.Srt(similarity)
 
     def kNN_predict(self, testdata, k, x, n_train, n_labels):

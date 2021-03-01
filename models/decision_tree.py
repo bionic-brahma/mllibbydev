@@ -20,6 +20,12 @@ def entropy(y):
     :param y: Column to calculate the entropy of.
     :return: Entropy value
     """
+    # Testing if the input is an np.array
+    assert isinstance(y, np.ndarray), " The input is not an np.array"
+
+    # Input attribute should have only positive integer as lable
+    assert not ((y<0).any()), "The input array includes -ve values"
+
     hist = np.bincount(y)
     ps = hist / len(y)
 
