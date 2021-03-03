@@ -5,7 +5,7 @@ import cv2
 import pytesseract
 
 vidcam = False
-file = "test/1.jpeg"
+file = "test/img_2.png"
 min_thresh = 0
 resize_factor = 2
 rotation = 6

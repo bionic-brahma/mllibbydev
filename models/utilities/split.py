@@ -6,7 +6,7 @@ import numpy as np
 def subsets_by_label(X, y):
     """
     The methode to split dataset into the subsets containing the same label per subset
-    It servers as a helper function for OvO and OvA approches of multiclass-classifications
+    It serves as a helper function for OvO and OvA approches of multiclass-classifications
 
     :param X: Dataset feature matrix containing features of the all records
     :param y: The dataset labels in list format

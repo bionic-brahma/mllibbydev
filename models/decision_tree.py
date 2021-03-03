@@ -20,14 +20,17 @@ def entropy(y):
     :param y: Column to calculate the entropy of.
     :return: Entropy value
     """
-    # Testing if the input is an np.array
-    assert isinstance(y, np.ndarray), " The input is not an np.array"
+    counter_dicts = dict()
+    for i in np.unique(y):
+        counter_dicts[i] = 0
+    for i in y:
+        counter_dicts[i] += 1
+    counter_dicts_values = []
+    for key, values in counter_dicts.items():
+        counter_dicts_values.append(values)
 
-    # Input attribute should have only positive integer as lable
-    assert not ((y<0).any()), "The input array includes -ve values"
-
-    hist = np.bincount(y)
-    ps = hist / len(y)
+    hist = counter_dicts_values
+    ps = np.array(hist) / len(y)
 
     return -np.sum([p * np.log2(p) for p in ps if p > 0])
 

@@ -1,5 +1,5 @@
 #######################################################################################
-## Linear regression to work on binary classification                               #
+## Linear regression to work on binary classification                                 #
 ## Work by Devendra Kumar for Risk Latte AI Inc.                                      #
 #######################################################################################
 
@@ -44,11 +44,10 @@ class regression:
                 print("-------> iteration number: ", it, "  Loss: ", loss)
                 print("-------> weights: ", self.weights)
 
-
     def predict(self, input_X):
         """
         Make the prediction for the give input feature vector
         :param input_X: Feature vector to make classification on
         :return: pritected value for the feature vector
         """
-        return (np.dot(input_X, self.weights) + self.bias)#[:, 0]
+        return np.dot(input_X, self.weights) + self.bias  # [:, 0]

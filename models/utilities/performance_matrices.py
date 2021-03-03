@@ -55,12 +55,13 @@ def F_Beta_score(precision, recall, beta=1):
     return (1 + beta ** 2) * (precision * recall) / ((beta ** 2) * precision + recall)
 
 
-def confusion_matrix(actual, predicted):
+def confusion_matrix(actual, predicted, beta=1):
     """
     This function computes the confusion matrix for the given predicted
     and actual lists of labels
     :param actual: The list of actual labels
     :param predicted: The list of predicted labels
+    :param beta: Controls the balance between precision and recall
     :return: list of unique labels and the confusion matrix
     """
     unique = set(actual)
@@ -94,9 +95,9 @@ def confusion_matrix(actual, predicted):
         predicted_total[value] = sum(np.array(matrix)[:, i])
         recall[value] = true_predicted[value] / actual_total[value]
         precision[value] = true_predicted[value] / predicted_total[value]
-        F1_score[value] = F_Beta_score(precision[value], recall[value])
+        F1_score[value] = F_Beta_score(precision[value], recall[value], beta=beta)
 
-    print("F1 score: ")
+    print("F_",beta," score: ")
     print(F1_score)
     print("Recall: ")
     print(recall)
