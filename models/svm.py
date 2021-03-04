@@ -121,7 +121,7 @@ class SVM:
         """
         datasets_by_OVO = OVOdatamaker(X, y)
         self.models = list()
-        for i in tqdm(range(len(datasets_by_OVO)), desc= "Training..."):
+        for i in tqdm(range(len(datasets_by_OVO)), desc="Training..."):
             tempX = datasets_by_OVO[i][0]
             tempY = datasets_by_OVO[i][1]
             tempX, tempY = shuffle_data(tempX, tempY, len(datasets_by_OVO))
@@ -149,7 +149,7 @@ class SVM:
 
 def mode_in_labels(arr):
     set_labels = set(arr)
-    freq_dict= dict()
+    freq_dict = dict()
     for i in set_labels:
         freq_dict[i] = 0
     for i in arr:
