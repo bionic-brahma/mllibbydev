@@ -5,7 +5,7 @@ import sys
 
 class CompressPDF:
 
-    def __init__(self, compress_level=0, show_info=False):
+    def __init__(self, compress_level=4, show_info=False):
         """
         Constructor for the CompressPDF class.
         :param compress_level: levels of compressor 0- follows default and 4- follows maximum compression
@@ -47,7 +47,7 @@ class CompressPDF:
 
             if self.show_compress_info:
                 initial_size = os.path.getsize(file)
-
+              
             subprocess.call(['gs', '-sDEVICE=pdfwrite', '-dCompatibilityLevel=1.4',
                              '-dPDFSETTINGS={}'.format(self.quality[self.compress_level]),
                              '-dNOPAUSE', '-dQUIET', '-dBATCH',
@@ -72,30 +72,3 @@ class CompressPDF:
             print("Unexpected error:".format(e.output))
 
             return False
-
-
-if __name__ == '__main__':
-
-    start_folder = "test/"
-    compress = 4
-    p = CompressPDF(compress, show_info=True)
-
-    compress_folder = os.path.join(start_folder, "test_out/")
-
-    for filename in os.listdir(start_folder):
-
-        my_name, file_extension = os.path.splitext(filename)
-
-        if file_extension == '.pdf':
-
-            file = os.path.join(start_folder, filename)
-
-            new_file = os.path.join(compress_folder, filename)
-
-            if p.compress(file, new_file):
-
-                print("{} Compression done.".format(filename))
-
-            else:
-
-                print("Format Error")
