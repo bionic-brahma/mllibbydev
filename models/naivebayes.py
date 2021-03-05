@@ -81,3 +81,29 @@ class NaiveBayes:
         numerator = np.exp(- (x - mean) ** 2 / (2 * var))
         denominator = np.sqrt(2 * np.pi * var)
         return numerator / denominator
+
+    def get_model_params(self):
+        """
+        This method returns a dictionary of parameters
+        :return: dictionary of parameters
+        """
+        model_para = dict()
+        model_para["classes"] = self._classes
+        model_para["mean"] = self._mean
+        model_para["var"] = self._var
+        model_para["priors"] = self._priors
+
+        return model_para
+
+    def load_model_para(self, model_para):
+        """
+        This method loads the weights and bias of the given model parameters
+        and hence can do the transfer learning with compatible dictionary
+        :param model_para: dictionary containing model parameters
+        :return: None
+        """
+        self._classes = model_para["classes"]
+        self._mean = model_para["mean"]
+        self._var = model_para["var"]
+        self._priors = model_para["priors"]
+

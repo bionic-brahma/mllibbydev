@@ -51,3 +51,25 @@ class regression:
         :return: pritected value for the feature vector
         """
         return np.dot(input_X, self.weights) + self.bias  # [:, 0]
+
+    def get_model_params(self):
+        """
+        This method returns a dictionary of parameters
+        :return: dictionary of parameters
+        """
+        model_para = dict()
+        model_para["weights"] = self.weights
+        model_para["bais"] = self.bias
+
+        return model_para
+
+    def load_model_para(self, model_para):
+        """
+        This method loads the weights and bias of the given model parameters
+        and hence can do the transfer learning with compatible dictionary
+        :param model_para: dictionary containing model parameters
+        :return: None
+        """
+        self.weights = model_para["weigths"]
+        self.bias = model_para["bias"]
+

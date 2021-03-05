@@ -212,7 +212,6 @@ class DecisionTree:
         return most_common
 
 
-'''
     def Save_Model(self, file_name):
         """
         Saves the model in JSON format
@@ -244,5 +243,5 @@ class DecisionTree:
         with open(file_name, "r") as model_file:
             data = json.load(model_file)
             self.parameters = ast.literal_eval(data["model_param"])
-            return data '''
+            return data
 
