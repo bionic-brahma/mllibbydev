@@ -59,7 +59,7 @@ class regression:
         """
         model_para = dict()
         model_para["weights"] = self.weights
-        model_para["bais"] = self.bias
+        model_para["bias"] = self.bias
 
         return model_para
 
@@ -70,6 +70,6 @@ class regression:
         :param model_para: dictionary containing model parameters
         :return: None
         """
-        self.weights = model_para["weigths"]
+        self.weights = model_para["weights"]
         self.bias = model_para["bias"]
 

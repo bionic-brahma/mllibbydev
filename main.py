@@ -1,4 +1,4 @@
-from models import  naivebayes
+from models import svm
 from models.utilities.split import k_cross_validation_split, train_test_split, dataset_by_single_label, subsets_by_label
 from models.utilities.performance_matrices import accuracy, k_fold_validation_accuracy, confusion_matrix
 from models.utilities.split import OVOdatamaker, subsets_by_label
@@ -17,9 +17,14 @@ labels = ["dev","dev","dev","dev","dev","dev","dev","dev","dev","dev","dev","arj
 # print(len(xfeat), len(labels))
 trx, testx, tr_y, testy = train_test_split(np.array(xfeat), np.array(labels), shuffle=True)
 print("train: ",tr_y)
-model = naivebayes.NaiveBayes()
+model = svm.SVM()
 model.fit(trx, tr_y)
 predicted = model.predict(testx)
+print(predicted)
+print(model.get_model_params())
+modelx = svm.SVM()
+modelx.load_model_para(model.get_model_params())
+predicted = modelx.predict(testx)
 print(predicted)
 input()
 print("Accuracy: ", accuracy(testy, predicted))
@@ -32,7 +37,7 @@ X, y = auto_oversample(np.array(xfeat), np.array(labels), kpoint=2, method='smot
 # print("----- ----- -----  new record size ---- ---- -------", len(y))
 trx, testx, tr_y, testy = train_test_split(X, y, shuffle=True)
 print("train: ",tr_y)
-model = naivebayes.NaiveBayes()
+model = svm.SVM()
 model.fit(trx, tr_y)
 predicted = model.predict(testx)
 print(predicted)
@@ -45,7 +50,7 @@ X, y = auto_oversample(np.array(xfeat), np.array(labels), kpoint=2, method='adas
 # print("----- ----- -----  new record size ---- ---- -------", len(y))
 trx, testx, tr_y, testy = train_test_split(X, y, shuffle=True)
 print("train: ",tr_y)
-model = naivebayes.NaiveBayes()
+model = svm.SVM()
 model.fit(trx, tr_y)
 predicted = model.predict(testx)
 print(predicted)

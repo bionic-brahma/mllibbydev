@@ -25,6 +25,29 @@ class SVM_base:
         self.b = None
         self.label_dict = dict()
 
+    def get_model_params(self):
+        """
+        This method returns a dictionary of parameters
+        :return: dictionary of parameters
+        """
+        model_para = dict()
+        model_para["label"] = self.label_dict
+        model_para["weights"] = self.w
+        model_para["bias"] = self.b
+
+        return model_para
+
+    def load_model_para(self, model_para):
+        """
+        This method loads the weights and bias of the given model parameters
+        and hence can do the transfer learning with compatible dictionary
+        :param model_para: dictionary containing model parameters
+        :return: None
+        """
+        self.w = model_para["weights"]
+        self.b = model_para["bias"]
+        self.label_dict = model_para["label"]
+
     def fit(self, X, y):
         """
         Fits the tree as per the training data.
@@ -111,6 +134,28 @@ class SVM:
         self.b = None
         self.label_dict = dict()
         self.models = list()
+
+    def get_model_params(self):
+        """
+        This method returns a dictionary of parameters
+        :return: dictionary of parameters
+        """
+        model_para = dict()
+        model_para["model_params"] = [model.get_model_params() for model in self.models]
+
+        return model_para
+
+    def load_model_para(self, model_para):
+        """
+        This method loads the weights and bias of the given model parameters
+        and hence can do the transfer learning with compatible dictionary
+        :param model_para: dictionary containing model parameters
+        :return: None
+        """
+        for model_params in model_para["model_params"]:
+            model = SVM_base(learning_rate=self.lr, lambda_param=self.lambda_param, n_iters=self.n_iters)
+            model.load_model_para(model_params)
+            self.models.append(model)
 
     def fit(self, X, y):
         """
